@@ -31,7 +31,7 @@ const invoices = [
 
 export default function Root() {
   return (
-    <section className="w-full h-full space-y-6 font-inter">
+    <section className="w-full  space-y-6 font-inter">
       <section className="space-y-[21px]">
         <h2 className="font-medium text-base">Today</h2>
         <ClassInfo className="bg-white py-[20px] px-[13px]" />

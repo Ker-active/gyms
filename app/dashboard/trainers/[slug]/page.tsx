@@ -47,7 +47,7 @@ export default function TrainersDetails() {
           Deactivate
         </Button>
       </header>
-      <section className="flex pb-40 sm:pb-0  flex-col gap-[40px]">
+      <section className="flex  flex-col gap-[40px]">
         <section className="bg-white flex flex-col lg:flex-row gap-4 lg:gap-8 xl:gap-[50px] px-[23px] py-[34px] rounded-[10px]">
           <div className="w-full relative max-w-[279px] h-[292px]">
             <Image fill alt="Trainers' Image" src={"/images/trainer.png"} />

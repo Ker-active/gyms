@@ -9,8 +9,8 @@ interface IProps {
 export const BookNowModal = ({ isOpen, setIsOpen }: IProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="min-w-[850px]  flex flex-col sm:flex-row gap-4 sm:gap-[30px]">
-        <div className="min-w-[300px] relative h-[350px]">
+      <DialogContent className="w-[90vw] sm:min-w-[850px] overflow-y-auto max-h-[80dvh]  flex flex-col sm:flex-row gap-4 sm:gap-[30px]">
+        <div className="min-w-[300px] relative min-h-[350px]">
           <Image fill alt="Trainers' Image" src={"/images/trainer.png"} />
         </div>
         <article className="w-full gap-2 grid">

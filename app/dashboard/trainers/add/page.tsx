@@ -46,7 +46,7 @@ export default function Page() {
       </header>
       <section className="w-full bg-white flex-grow">
         <Overlay isOpen={isPopoverOpen} onClose={() => setIsPopoverOpen(false)} />
-        <div className="flex flex-col pt-20 mx-auto max-w-[626px] w-full bg-white">
+        <div className="flex flex-col px-4 pt-20 mx-auto max-w-[626px] w-full bg-white">
           <Form {...form}>
             <Popover
               containerClassName="z-50"
@@ -56,7 +56,7 @@ export default function Page() {
               align="start"
               positions={["bottom"]}
               content={
-                <ul className="w-[calc(100vw-32px)] max-h-[350px] overflow-y-auto rounded-[20px] py-[20px] flex flex-col sm:w-[calc(626px-150px)] bg-white z-50">
+                <ul className="w-[calc(100vw-64px)] max-h-[350px] overflow-y-auto rounded-[20px] py-[20px] flex flex-col sm:w-[calc(626px-150px)] bg-white z-50">
                   {Array.from({ length: 16 }).map((_, index) => (
                     <li className="flex flex-row justify-between py-[10px] items-center px-4 hover:bg-[#F9F9F9] hover:border-l-2 hover:border-primary transition-all duration-200 group" key={index}>
                       <div className="flex gap-[11px] ml-4 flex-row items-center">
@@ -66,7 +66,7 @@ export default function Page() {
                         </Avatar>
                         <p>Wisdom Ikpeama</p>
                       </div>
-                      <Button className="italic text-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-200" variant="link">
+                      <Button className="italic text-sm text-primary sm:opacity-0 group-hover:opacity-100 transition-opacity duration-200" variant="link">
                         Add
                       </Button>
                     </li>
