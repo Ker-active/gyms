@@ -1,5 +1,4 @@
 export * from "./sidebar";
-export * from "./gyms";
 export * from "./fitness-classes";
 export * from "./popular-activities";
 export * from "./trainers";
