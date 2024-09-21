@@ -1,7 +1,9 @@
 "use client";
 
-import { FilterHeader, Trainers } from "@/components/shared";
-import { Button } from "@/components/ui/button";
+import { Trainers } from "@/components/shared";
+import { buttonVariants } from "@/components/ui/button";
+import { Routes } from "@/lib";
+import Link from "next/link";
 
 export default function TrainersPage() {
   return (
@@ -10,8 +12,11 @@ export default function TrainersPage() {
         <div className="flex flex-row w-full gap-[18px] items-center">
           <h2 className="section-header">Trainers and Coaches</h2>
         </div>
-        <Button size="sm">Add Trainer</Button>
+        <Link href={Routes["add-trainer"]} className={buttonVariants({ size: "sm" })}>
+          Add Trainer
+        </Link>
       </header>
+
       <Trainers showAll />
     </section>
   );

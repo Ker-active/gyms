@@ -16,7 +16,7 @@ export default function Class() {
           </Link>
         </div>
       </header>
-      <div className="h-full bg-white w-full grid place-items-center">
+      <div className="h-full  bg-white w-full grid place-items-center">
         <p className="text-[#5B5971] text-[13px] text-center">
           You do not have any class add yet.{" "}
           <Link href={Routes["add-class"]} className="text-primary">

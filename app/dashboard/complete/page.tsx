@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Amenities,
-  Media,
-  PersonalInformation,
-  ProfessionalSummary,
-  Services,
-} from "@/components/complete";
+import { Amenities, Media, PersonalInformation, ProfessionalSummary, Services } from "@/components/complete";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { cn } from "@/lib";
@@ -28,7 +22,7 @@ const schema = z.object({
     professionalSummary: z.string().min(1, { message: "Summary is required." }),
   }),
   services: z.array(z.string().min(1, { message: "Service is required." })),
-  amenities: z.array(z.string().min(1, { message: "Service is required." })),
+  amenities: z.array(z.string().min(1, { message: "This is required." })),
   media: z.array(z.any()),
 });
 
@@ -41,11 +35,7 @@ const calculatePercentage = (data: TProfile) => {
 
   // Check personalInformation completeness (25%)
   const personalInfoComplete =
-    personalInformation?.fullname &&
-    personalInformation?.email &&
-    personalInformation?.phoneNumber &&
-    personalInformation?.instagram &&
-    personalInformation?.professionalSummary;
+    personalInformation?.fullname && personalInformation?.email && personalInformation?.phoneNumber && personalInformation?.instagram && personalInformation?.professionalSummary;
 
   if (personalInfoComplete) percentage += 25;
 
@@ -71,48 +61,41 @@ export default function Page() {
   const percentage = calculatePercentage(form.watch());
 
   function onSubmit() {
-    if (form.getValues("media").length === 0)
-      return toast.error("Media is required");
+    if (form.getValues("media").length === 0) return toast.error("Media is required");
   }
 
   return (
-    <section className='flex flex-col gap-[30px]'>
-      <header
-        className={cn(
-          "flex flex-row bg-[#FFFAF1] border py-[9px] px-4 rounded-[8px]  border-[#FFB020] items-center justify-between",
-          percentage == 100 && "border-primary"
-        )}
-      >
-        <div className='flex flex-row gap-2 items-center'>
+    <section className="flex flex-col gap-[30px]">
+      <header className={cn("flex flex-row bg-[#FFFAF1] border py-[9px] px-4 rounded-[8px]  border-[#FFB020] items-center justify-between", percentage == 100 && "border-primary")}>
+        <div className="flex flex-row gap-2 items-center">
           <Info color={percentage == 100 ? "#008080" : "#996A13"} size={16} />
-          <p
-            className={cn(
-              "text-[#996A13] font-sm font-semibold",
-              percentage == 100 && "text-primary"
-            )}
-          >
-            Complete your profile to continue
-          </p>
+          <p className={cn("text-[#996A13] font-sm font-semibold", percentage == 100 && "text-primary")}>Complete your profile to continue</p>
         </div>
-        <Button
-          type='submit'
-          form='form'
-          size='sm'
-          className={cn(
-            "bg-[#D59C34] w-fit",
-            percentage == 100 && "bg-primary"
-          )}
-        >
+        <Button type="submit" form="form" size="sm" className={cn("bg-[#D59C34] w-fit", percentage == 100 && "bg-primary")}>
           {percentage}%
         </Button>
       </header>
       <Form {...form}>
-        <form
-          className='flex flex-col gap-[30px]'
-          id='form'
-          onSubmit={form.handleSubmit(onSubmit)}
-        >
-          <PersonalInformation />
+        <form className="flex flex-col gap-[30px]" id="form" onSubmit={form.handleSubmit(onSubmit)}>
+          <PersonalInformation
+            fields={[
+              {
+                name: "personalInformation.instagram",
+                label: "Instagram",
+                placeholder: "Full Instagram URL",
+              },
+              {
+                name: "personalInformation.twitter",
+                label: "X (twitter)",
+                placeholder: "Full X URL",
+              },
+              {
+                name: "personalInformation.website",
+                label: "Website",
+                placeholder: "https://url.com",
+              },
+            ]}
+          />
           <ProfessionalSummary />
           <Services />
           <Amenities />

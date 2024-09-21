@@ -18,3 +18,19 @@ export const AddClassSchema = z.object({
 });
 
 export type TClassSchema = z.infer<typeof AddClassSchema>;
+
+export const AddEventSchema = AddClassSchema.pick({
+  title: true,
+  availableSlot: true,
+  location: true,
+  room: true,
+  date: true,
+  timeFrom: true,
+  timeTo: true,
+  price: true,
+  free: true,
+  onLineLink: true,
+  picture: true,
+});
+
+export type TEventSchema = z.infer<typeof AddEventSchema>;

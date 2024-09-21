@@ -1,14 +1,7 @@
 "use client";
 
 import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "../ui/input";
@@ -42,15 +35,13 @@ export const PersonalInformation = () => {
     defaultValues: {},
   });
   return (
-    <article className='flex bg-white px-[20px] py-[15px] rounded-[8px] flex-col gap-4'>
+    <article className="flex bg-white px-[20px] py-[15px] rounded-[8px] flex-col gap-4">
       <header>
-        <h3 className='text-[#1C1939] text-[22px] font-semibold font-inter'>
-          Personal Information
-        </h3>
+        <h3 className="text-[#1C1939] text-[22px] font-semibold font-inter">Personal Information</h3>
       </header>
       <hr />
       <Form {...formSchema}>
-        <form className='grid gap-x-4 gap-y-[18px] grid-cols-1 sm:grid-cols-2'>
+        <form className="grid gap-x-4 gap-y-[18px] grid-cols-1 sm:grid-cols-2">
           {fields.map((field) => (
             <FormField
               key={field.name}
@@ -60,18 +51,14 @@ export const PersonalInformation = () => {
                 <FormItem>
                   <FormLabel>{field.label}</FormLabel>
                   <FormControl>
-                    <Input
-                      className='border-0 outline-0 h-[50px] bg-off-white'
-                      placeholder={field.placeholder}
-                      {...formField}
-                    />
+                    <Input className="border-0 outline-0 h-[50px] bg-off-white" placeholder={field.placeholder} {...formField} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
           ))}
-          <Button className='rounded-sm'>Save</Button>
+          <Button className="rounded-sm">Save</Button>
         </form>
       </Form>
     </article>

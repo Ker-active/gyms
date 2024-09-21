@@ -1,29 +1,27 @@
 "use client";
-
 import { FormCheckBox, FormDate, FormInput, FormSelect } from "@/components/forms";
 import { SectionHeader } from "@/components/shared/section-header";
-import { Button } from "@/components/ui/button";
 import { Form, FormLabel } from "@/components/ui/form";
-import { AddClassSchema, TClassSchema } from "@/schemas/dashboard";
+import { AddEventSchema, TEventSchema } from "@/schemas/dashboard";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function Page() {
-  const router = useRouter();
-  const form = useForm<TClassSchema>({
-    resolver: zodResolver(AddClassSchema),
+  const searchParams = useSearchParams();
+  const isEdit = searchParams.get("eventId") ? true : false;
+  const form = useForm<TEventSchema>({
+    resolver: zodResolver(AddEventSchema),
     mode: "onBlur",
     defaultValues: {
       free: false,
     },
   });
 
-  function onSubmit(values: TClassSchema) {
+  function onSubmit(values: TEventSchema) {
     if (!form.getValues("picture")) return toast.error("Picture is required");
   }
 
@@ -33,43 +31,31 @@ export default function Page() {
 
     form.setValue("picture", files[0]);
   }
-
   return (
     <section className="flex flex-col font-inter gap-10">
-      <SectionHeader className="mt-2  sm:mt-4" type="submit" form="form" title="Add New Class" rightElementText="Add Class" />
+      <SectionHeader type="submit" form="form" title={isEdit ? "Edit Event" : "Add New Event"} rightElementText="Save Event" />
       <Form {...form}>
         <form id="form" onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col  bg-white  px-[27px] py-[40px] rounded-[8px] gap-6  ">
           <div className="grid grid-cols-1 gap-[28px] sm:grid-cols-2">
-            <FormInput<TClassSchema> placeholder="Example: CrossFit" label="Title" name="title" />
-            <FormSelect<TClassSchema> placeholder="Select" options={["CrossFit", "Yoga", "Zumba"]} label="Type" name="type" />
-            <FormSelect<TClassSchema> placeholder="Select" options={["John doe", "Wura"]} label="Trainer" name="trainer" />
-            <FormInput<TClassSchema> placeholder="Enter" label="Available Slot" name="availableSlot" />
-            <FormInput<TClassSchema> placeholder="Enter" label="Location" name="location" />
-            <FormInput<TClassSchema> placeholder="Enter" label="Room" name="room" />
-            <FormDate<TClassSchema> name="date" />
+            <FormInput<TEventSchema> placeholder="Example: CrossFit" label="Title" name="title" />
+            <FormInput<TEventSchema> placeholder="Enter" label="Available Slot" name="availableSlot" />
+            <FormInput<TEventSchema> placeholder="Enter" label="Location" name="location" />
+            <FormInput<TEventSchema> placeholder="Enter" label="Room" name="room" />
+            <FormDate<TEventSchema> name="date" />
             <div className="space-y-2">
               <FormLabel>Time</FormLabel>
               <div className="flex flex-row gap-4 items-center">
-                <FormSelect<TClassSchema> options={["00:00", "01:00", "02:00"]} name="timeFrom" />
+                <FormSelect<TEventSchema> options={["00:00", "01:00", "02:00"]} name="timeFrom" />
                 <p>to</p>
-                <FormSelect<TClassSchema> options={["00:00", "01:00", "02:00"]} name="timeTo" />
+                <FormSelect<TEventSchema> options={["00:00", "01:00", "02:00"]} name="timeTo" />
               </div>
             </div>
             <div className="flex flex-row gap-6 items-center w-full justify-between">
-              <FormInput<TClassSchema> containerClassName="w-full" placeholder="Enter" label="Price" name="price" />
-              <FormCheckBox<TClassSchema> containerClassName="mt-auto mb-3" checkBoxProps={{ className: "w-[25px] h-[25px]" }} name="free" checkBoxLabel="Free?" />
+              <FormInput<TEventSchema> containerClassName="w-full" placeholder="Enter" label="Price" name="price" />
+              <FormCheckBox<TEventSchema> containerClassName="mt-auto mb-3" checkBoxProps={{ className: "w-[25px] h-[25px]" }} name="free" checkBoxLabel="Free?" />
             </div>
-            <FormInput<TClassSchema> placeholder="Enter" label="Online Link" name="onLineLink" />
+            <FormInput<TEventSchema> placeholder="Enter" label="Online Link" name="onLineLink" />
           </div>
-          <FormInput<TClassSchema>
-            className="h-[200px] resize-none"
-            maxLength={200}
-            placeholder="Write something..."
-            label="Description"
-            isTextArea
-            name="description"
-            formDescription="Not more than 200 words"
-          />
           <div>
             <FormLabel>Upload Picture of Class</FormLabel>
             <div className="relative border border-dashed min-h-[300px]  w-full rounded-[5px] overflow-hidden">

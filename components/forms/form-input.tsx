@@ -2,20 +2,21 @@
 
 import { UseControllerProps, useFormContext } from "react-hook-form";
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
-import { ComponentProps, HtmlHTMLAttributes } from "react";
+import { ComponentProps, ComponentPropsWithRef, HtmlHTMLAttributes } from "react";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 
 type IProps<T> = {
   name: keyof T;
   label?: string;
+  labelClassName?: string;
   formDescription?: string;
   containerClassName?: HtmlHTMLAttributes<HTMLDivElement>["className"];
   isTextArea?: boolean;
 } & UseControllerProps &
-  ComponentProps<typeof Input | typeof Textarea>;
+  ComponentPropsWithRef<typeof Input | typeof Textarea>;
 
-export const FormInput = <T extends Record<string, any>>({ label, name, formDescription, isTextArea, containerClassName, ...rest }: IProps<T>) => {
+export const FormInput = <T extends Record<string, any>>({ label, name, formDescription, labelClassName, isTextArea, containerClassName, ...rest }: IProps<T>) => {
   const form = useFormContext();
 
   return (
@@ -24,7 +25,7 @@ export const FormInput = <T extends Record<string, any>>({ label, name, formDesc
       name={name}
       render={({ field }) => (
         <FormItem className={containerClassName}>
-          {label && <FormLabel>{label}</FormLabel>}
+          {label && <FormLabel className={labelClassName}>{label}</FormLabel>}
 
           <FormControl>{isTextArea ? <Textarea name={name} {...(rest as any)} /> : <Input {...field} {...(rest as any)} />}</FormControl>
           <FormMessage />

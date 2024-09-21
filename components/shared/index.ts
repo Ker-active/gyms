@@ -13,3 +13,6 @@ export * from "./add-review-button";
 export * from "./reviews";
 export * from "./date-change";
 export * from "./copy-link";
+export * from "./book-now-modal";
+export * from "./empty";
+export * from "./section-header";

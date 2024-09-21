@@ -65,14 +65,10 @@ export const Classes = ({ isForTrainer = false }: IProps) => {
           <div className="flex relative no-scrollbar  overflow-x-auto bg-white gap-[30px] px-4 w-full flex-row items-center">
             {day.classes.map((event, index) => {
               return (
-                <Link
-                  href={`${Routes["class-details"]}/hello`}
-                  className={cn("px-4  min-w-[195px] pb-[11px] pt-4 rounded-[16px]", isForTrainer && "h-[80px]", backgrounds[(index + timeTable.indexOf(day)) % backgrounds.length])}
-                  key={index}
-                >
+                <div className={cn("px-4  min-w-[195px] pb-[11px] pt-4 rounded-[16px]", isForTrainer && "h-[80px]", backgrounds[(index + timeTable.indexOf(day)) % backgrounds.length])} key={index}>
                   <div className="flex mb-2 flex-row items-center justify-between">
                     <p className="font-semibold">{event.name}</p>
-                    <FloatingComponent />
+                    <FloatingComponent isForTrainer={isForTrainer} />
                   </div>
                   <div className="flex mb-1 gap-2 items-center flex-row">
                     <Clock size={16} />
@@ -90,7 +86,7 @@ export const Classes = ({ isForTrainer = false }: IProps) => {
                       </div>
                     </>
                   )}
-                </Link>
+                </div>
               );
             })}
           </div>
