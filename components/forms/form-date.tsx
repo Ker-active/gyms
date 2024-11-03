@@ -4,12 +4,10 @@ import * as React from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useFormContext, UseControllerProps } from "react-hook-form";
-
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 type DatePickerProps<T> = {
   name: keyof T;
@@ -25,10 +23,10 @@ export const FormDate = <T extends Record<string, any>>({ label = "Pick a date",
       name={name}
       render={({ field }) => (
         <FormItem>
+          {label && <FormLabel>{label}</FormLabel>}
           <Popover>
             <PopoverTrigger asChild>
-              <>
-                {label && <FormLabel>{label}</FormLabel>}
+              <FormControl>
                 <button
                   className={cn(
                     "flex h-[45px] items-center w-full rounded-[5px] border border-input bg-background px-5 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground  placeholder:font-extralight  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
@@ -38,7 +36,7 @@ export const FormDate = <T extends Record<string, any>>({ label = "Pick a date",
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {field.value ? format(new Date(field.value), "PPP") : <span>Pick a date</span>}
                 </button>
-              </>
+              </FormControl>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">
               <Calendar

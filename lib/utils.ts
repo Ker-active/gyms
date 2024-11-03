@@ -2,19 +2,41 @@ import { type ClassValue, clsx } from "clsx";
 import { isToday, isYesterday, format } from "date-fns";
 import { twMerge } from "tailwind-merge";
 import { Routes } from "./routes";
+import { toast } from "sonner";
+import { InputProps } from "@/components/ui/input";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export enum CacheKeys {
+  USER = "user",
+  CLASSES = "classes",
+  Events = "events",
+  Trainers = "trainers",
+}
+
+export const showError = (error: any) => {
+  return toast.error(error.response.data.message);
+};
+
+export const getInitials = (name: string) => {
+  return name
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase())
+    .join("")
+    .slice(0, 2);
+};
+
 export const publicRoutes: string[] = [];
 export const authRoutes: string[] = [Routes.login, Routes.register];
 
-export type FormFieldType<T> = {
-  name: keyof T;
+interface FormFieldTypeObject<T> extends Omit<Partial<InputProps>, "name"> {
   label: string;
-  placeholder: string;
-}[];
+  name: keyof T;
+}
+
+export type FormFieldType<T> = FormFieldTypeObject<T>[];
 
 interface Message {
   id: number;
@@ -22,11 +44,7 @@ interface Message {
   senderId: string;
 }
 
-export const isSameUser = (
-  messages: Message[],
-  currentMessage: Message,
-  index: number
-) => {
+export const isSameUser = (messages: Message[], currentMessage: Message, index: number) => {
   const previousMessage = messages[index - 1];
   if (!previousMessage) {
     return false;
@@ -60,42 +78,21 @@ export const calculateTime = (inputDateStr: string) => {
   } as any;
 
   // Check if it's today, tomorrow, or more than one day ago
-  if (
-    inputDate.getUTCDate() === currentDate.getUTCDate() &&
-    inputDate.getUTCMonth() === currentDate.getUTCMonth() &&
-    inputDate.getUTCFullYear() === currentDate.getUTCFullYear()
-  ) {
+  if (inputDate.getUTCDate() === currentDate.getUTCDate() && inputDate.getUTCMonth() === currentDate.getUTCMonth() && inputDate.getUTCFullYear() === currentDate.getUTCFullYear()) {
     // Today: Convert to AM/PM format
     const ampmTime = inputDate.toLocaleTimeString("en-US", timeFormat);
     return ampmTime;
-  } else if (
-    inputDate.getUTCDate() === currentDate.getUTCDate() - 1 &&
-    inputDate.getUTCMonth() === currentDate.getUTCMonth() &&
-    inputDate.getUTCFullYear() === currentDate.getUTCFullYear()
-  ) {
+  } else if (inputDate.getUTCDate() === currentDate.getUTCDate() - 1 && inputDate.getUTCMonth() === currentDate.getUTCMonth() && inputDate.getUTCFullYear() === currentDate.getUTCFullYear()) {
     // Tomorrow: Show "Yesterday"
 
     return "Yesterday";
-  } else if (
-    Math.floor((+currentDate - +inputDate) / (1000 * 60 * 60 * 24)) > 1 &&
-    Math.floor((+currentDate - +inputDate) / (1000 * 60 * 60 * 24)) <= 7
-  ) {
-    const timeDifference = Math.floor(
-      (+currentDate - +inputDate) / (1000 * 60 * 60 * 24)
-    );
+  } else if (Math.floor((+currentDate - +inputDate) / (1000 * 60 * 60 * 24)) > 1 && Math.floor((+currentDate - +inputDate) / (1000 * 60 * 60 * 24)) <= 7) {
+    const timeDifference = Math.floor((+currentDate - +inputDate) / (1000 * 60 * 60 * 24));
 
     const targetDate = new Date();
     targetDate.setDate(currentDate.getDate() - timeDifference);
 
-    const daysOfWeek = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const targetDay = daysOfWeek[targetDate.getDay()];
 
     return targetDay;

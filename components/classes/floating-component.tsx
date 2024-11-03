@@ -5,19 +5,34 @@ import { Calendar, ChevronRight, Eye, Pencil, Share2, Trash2 } from "lucide-reac
 import { BookNowModal, CopyLink } from "../shared";
 import { useState } from "react";
 import Link from "next/link";
-import { Routes } from "@/lib";
+import { CacheKeys, Routes } from "@/lib";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { client } from "@/lib/api";
 
 interface IProps {
   isForTrainer?: boolean;
+  onlineLink?: string;
+  _id: string;
 }
 
-export const FloatingComponent = ({ isForTrainer = false }: IProps) => {
+export const FloatingComponent = ({ isForTrainer = false, onlineLink = "online link", _id = "giberrish" }: IProps) => {
   const [isBookNowModalOpen, setIsBookNowModalOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   function stopPropagation(e: any) {
     e.preventDefault();
     e.stopPropagation();
   }
+
+  const { mutate } = useMutation({
+    mutationFn: () => client.delete(`/class/delete/${_id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [CacheKeys.CLASSES] });
+      toast.success("Class deleted successfully");
+    },
+  });
+
   return (
     <>
       <BookNowModal isOpen={isBookNowModalOpen} setIsOpen={setIsBookNowModalOpen} />
@@ -28,15 +43,17 @@ export const FloatingComponent = ({ isForTrainer = false }: IProps) => {
           </MenubarTrigger>
           <MenubarContent>
             <MenubarItem asChild>
-              <Link className="flex flex-row items-center text-sm gap-2 text-[#344054] w-full" href={`${Routes["class-details"]}/hello`}>
+              <Link className="flex flex-row items-center text-sm gap-2 text-[#344054] w-full" href={`${Routes["class-details"]}/${_id}`}>
                 <Eye size={16} color="#008080" />
                 <span>View Details</span>
               </Link>
             </MenubarItem>
             {!isForTrainer && (
-              <MenubarItem className="flex flex-row items-center text-sm gap-2 text-[#344054] w-full">
-                <Pencil size={16} color="#008080" />
-                <span>Edit</span>
+              <MenubarItem asChild>
+                <Link className="flex flex-row items-center text-sm gap-2 text-[#344054] w-full" href={`${Routes["add-class"]}?classId=${_id}`}>
+                  <Pencil size={16} color="#008080" />
+                  <span>Edit</span>
+                </Link>
               </MenubarItem>
             )}
 
@@ -65,14 +82,22 @@ export const FloatingComponent = ({ isForTrainer = false }: IProps) => {
               </MenubarSubTrigger>
               <MenubarSubContent>
                 <MenubarItem className="w-[364px] text-[#1C1939] flex flex-col items-start space-y-2 rounded-[8px]">
-                  <CopyLink />
+                  <CopyLink link={onlineLink} />
                 </MenubarItem>
               </MenubarSubContent>
             </MenubarSub>
             {!isForTrainer && (
-              <MenubarItem className="flex flex-row items-center text-sm text-[#344054] gap-2 w-full">
-                <Trash2 size={16} color="#008080" />
-                <span>Delete</span>
+              <MenubarItem asChild>
+                <button
+                  onClick={() => {
+                    mutate();
+                    toast.success("Deleting...");
+                  }}
+                  className="flex flex-row items-center text-sm text-[#344054] gap-2 w-full"
+                >
+                  <Trash2 size={16} color="#008080" />
+                  <span>Delete</span>
+                </button>
               </MenubarItem>
             )}
           </MenubarContent>

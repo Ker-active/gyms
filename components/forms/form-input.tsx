@@ -27,7 +27,7 @@ export const FormInput = <T extends Record<string, any>>({ label, name, formDesc
         <FormItem className={containerClassName}>
           {label && <FormLabel className={labelClassName}>{label}</FormLabel>}
 
-          <FormControl>{isTextArea ? <Textarea name={name} {...(rest as any)} /> : <Input {...field} {...(rest as any)} />}</FormControl>
+          <FormControl>{isTextArea ? <Textarea {...field} {...(rest as any)} /> : <Input {...field} {...(rest as any)} />}</FormControl>
           <FormMessage />
           {formDescription && <FormDescription className="text-[12px] text-[#B2B2B9]">{formDescription}</FormDescription>}
         </FormItem>

@@ -11,7 +11,11 @@ import { Form } from "@/components/ui/form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/forms";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
+import { useGetTrainers } from "@/hooks/shared";
+import { TUser } from "@/lib/types";
+import { toast } from "sonner";
+import { AvatarName } from "@/components/shared";
 
 const Schema = z.object({
   email: z.string().optional(),
@@ -21,6 +25,8 @@ type TSchema = z.infer<typeof Schema>;
 
 export default function Page() {
   const router = useRouter();
+  const { data } = useGetTrainers();
+  const [filteredTrainers, setFilteredTrainers] = useState([] as TUser[]);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const form = useForm<TSchema>({
     resolver: zodResolver(Schema),
@@ -30,7 +36,10 @@ export default function Page() {
   function onSubmit(values: TSchema) {
     if (!values.email) return;
 
-    console.log("got here");
+    const filtered = data?.data.filter((trainer) => trainer.email.toLowerCase().includes(values!?.email!.toLowerCase())) || [];
+    if (filtered.length < 1) return toast.error("Trainer not found");
+
+    setFilteredTrainers(filtered);
     setIsPopoverOpen(true);
   }
 
@@ -57,16 +66,10 @@ export default function Page() {
               positions={["bottom"]}
               content={
                 <ul className="w-[calc(100vw-64px)] max-h-[350px] overflow-y-auto rounded-[20px] py-[20px] flex flex-col sm:w-[calc(626px-150px)] bg-white z-50">
-                  {Array.from({ length: 16 }).map((_, index) => (
+                  {filteredTrainers.map((user, index) => (
                     <li className="flex flex-row justify-between py-[10px] items-center px-4 hover:bg-[#F9F9F9] hover:border-l-2 hover:border-primary transition-all duration-200 group" key={index}>
-                      <div className="flex gap-[11px] ml-4 flex-row items-center">
-                        <Avatar>
-                          <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                          <AvatarFallback>CN</AvatarFallback>
-                        </Avatar>
-                        <p>Wisdom Ikpeama</p>
-                      </div>
-                      <Button className="italic text-sm text-primary sm:opacity-0 group-hover:opacity-100 transition-opacity duration-200" variant="link">
+                      <AvatarName data={user} />
+                      <Button className="italic text-sm text-primary sm:opacity-0  opacity-100 sm:group-hover:opacity-100 transition-opacity duration-200" variant="link">
                         Add
                       </Button>
                     </li>

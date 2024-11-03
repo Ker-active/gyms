@@ -17,3 +17,4 @@ export enum Routes {
   attendance = "/dashboard/attendance",
   message = "/dashboard/message",
 }
+ 

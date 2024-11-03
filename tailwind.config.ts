@@ -75,14 +75,32 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        blink: {
+          "0%, 20%, 50%, 80%, 100%": { opacity: "1" },
+          "40%": { opacity: "0" },
+          "60%": { opacity: "1" },
+        },
       },
       animation: {
+        dot: "blink 1.4s infinite both",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    function ({ addUtilities }: any) {
+      addUtilities({
+        ".animation-delay-200": {
+          "animation-delay": "0.2s",
+        },
+        ".animation-delay-400": {
+          "animation-delay": "0.4s",
+        },
+      });
+    },
+  ],
 } satisfies Config;
 
 export default config;

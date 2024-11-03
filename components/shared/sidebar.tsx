@@ -1,5 +1,6 @@
 "use client";
 
+import { useGetUser } from "@/hooks/shared";
 import { Routes } from "@/lib";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -49,18 +50,24 @@ interface IProps extends HTMLAttributes<HTMLDivElement> {
 
 export const Sidebar = ({ className, setIsSidebarOpen }: IProps) => {
   const pathname = usePathname();
+  const { data: userData, isLoading } = useGetUser();
   return (
-    <aside className={cn("w-full overflow-y-auto min-w-[220px] max-w-[220px] h-full bg-white border-r-[0.7px] border-[#DCDCDC]", className)}>
+    <aside className={cn("w-full fixed left-0 overflow-y-auto min-w-[220px] max-w-[220px] h-full bg-white border-r-[0.7px] border-[#DCDCDC]", className)}>
       <ul className={"flex flex-col pt-[44px] gap-10"}>
         {links.map((item) => {
           const href = item.label === "Dashboard" ? Routes.home : `/dashboard/${item.label.toLowerCase()}`;
+          const isDisabled = isLoading || !userData?.data?.fullname;
 
           return (
-            <li className="flex flex-row px-10  items-center gap-4" key={item.label}>
-              <Image src={item.icon} width={27} height={27} alt={`${item.label} Icon`} />
-              <Link onClick={() => setIsSidebarOpen?.(false)} className={cn("text-[#565C78] text-base", pathname.includes(href) && "text-brand font-medium")} href={href}>
-                {item.label}
-              </Link>
+            <li className="flex flex-row px-10 items-center gap-4" key={item.label}>
+              <Image src={item.icon} width={27} height={27} alt={`${item.label} Icon`} style={{ opacity: isDisabled ? 0.5 : 1 }} />
+              {isDisabled ? (
+                <span className="text-[#E1E2E7] text-base cursor-not-allowed">{item.label}</span>
+              ) : (
+                <Link onClick={() => setIsSidebarOpen?.(false)} className={cn("text-[#565C78] text-base", pathname.includes(href) && "text-brand font-medium")} href={href}>
+                  {item.label}
+                </Link>
+              )}
             </li>
           );
         })}

@@ -11,14 +11,10 @@ const generalFields = [
     placeholder: "Enter fullname",
   },
   {
-    name: "personalInformation.email",
-    label: "Email address",
-    placeholder: "Enter email address",
-  },
-  {
     name: "personalInformation.phoneNumber",
     label: "Phone number",
     placeholder: "Enter phone number",
+    type: "number",
   },
   {
     name: "personalInformation.location",
@@ -28,7 +24,7 @@ const generalFields = [
 ] as const;
 
 interface IProps {
-  fields: { name: string; label: string; placeholder: string }[];
+  fields: { name: string; label: string; placeholder: string; type?: string }[];
 }
 
 export const PersonalInformation = ({ fields }: IProps) => {
@@ -50,7 +46,7 @@ export const PersonalInformation = ({ fields }: IProps) => {
               <FormItem>
                 <FormLabel>{field.label}</FormLabel>
                 <FormControl>
-                  <Input className=" h-[50px]" placeholder={field.placeholder} {...formField} />
+                  <Input className=" h-[50px]" {...field} {...formField} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

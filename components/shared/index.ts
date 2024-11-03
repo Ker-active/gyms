@@ -14,3 +14,6 @@ export * from "./copy-link";
 export * from "./book-now-modal";
 export * from "./empty";
 export * from "./section-header";
+export * from "./loading";
+export * from "./component-loading";
+export * from "./avatar-name";

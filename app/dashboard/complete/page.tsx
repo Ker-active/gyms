@@ -3,8 +3,11 @@
 import { Amenities, Media, PersonalInformation, ProfessionalSummary, Services } from "@/components/complete";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { cn } from "@/lib";
+import { useGetUser } from "@/hooks/shared";
+import { CacheKeys, cn, showError } from "@/lib";
+import { client } from "@/lib/api";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Info } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -13,7 +16,6 @@ import { z } from "zod";
 const schema = z.object({
   personalInformation: z.object({
     fullname: z.string().min(1, { message: "Fullname is required." }),
-    email: z.string().email(),
     phoneNumber: z.string().min(1, { message: "Phone number is required." }),
     location: z.string().optional(),
     instagram: z.string().min(1, { message: "Instagram is required." }),
@@ -34,8 +36,7 @@ const calculatePercentage = (data: TProfile) => {
   const { personalInformation, services, amenities, media } = data;
 
   // Check personalInformation completeness (25%)
-  const personalInfoComplete =
-    personalInformation?.fullname && personalInformation?.email && personalInformation?.phoneNumber && personalInformation?.instagram && personalInformation?.professionalSummary;
+  const personalInfoComplete = personalInformation?.fullname && personalInformation?.phoneNumber && personalInformation?.instagram && personalInformation?.professionalSummary;
 
   if (personalInfoComplete) percentage += 25;
 
@@ -48,6 +49,8 @@ const calculatePercentage = (data: TProfile) => {
 };
 
 export default function Page() {
+  const { data: userData } = useGetUser();
+  const queryClient = useQueryClient();
   const form = useForm<TProfile>({
     resolver: zodResolver(schema),
     mode: "onBlur",
@@ -58,10 +61,44 @@ export default function Page() {
     },
   });
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: (data: TProfile) => {
+      const formData = new FormData();
+      Object.entries(data.personalInformation).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+
+      data.services.forEach((service) => {
+        formData.append("services", service);
+      });
+
+      data.amenities.forEach((amenity) => {
+        formData.append("amenities", amenity);
+      });
+
+      data.media.forEach((media) => {
+        formData.append("media", media);
+      });
+
+      return client.put(`/user/update/${userData?.data._id}`, formData);
+    },
+    onError: (error) => {
+      showError(error);
+    },
+    onSuccess: (data) => {
+      console.log(data);
+      queryClient.invalidateQueries({
+        queryKey: [CacheKeys.USER],
+      });
+      toast.success("Profile updated successfully");
+    },
+  });
+
   const percentage = calculatePercentage(form.watch());
 
-  function onSubmit() {
+  function onSubmit(value: TProfile) {
     if (form.getValues("media").length === 0) return toast.error("Media is required");
+    mutate(value);
   }
 
   return (
@@ -71,7 +108,7 @@ export default function Page() {
           <Info color={percentage == 100 ? "#008080" : "#996A13"} size={16} />
           <p className={cn("text-[#996A13] font-sm font-semibold", percentage == 100 && "text-primary")}>Complete your profile to continue</p>
         </div>
-        <Button type="submit" form="form" size="sm" className={cn("bg-[#D59C34] w-fit", percentage == 100 && "bg-primary")}>
+        <Button disabled={isPending} type="submit" form="form" size="sm" className={cn("bg-[#D59C34] w-fit", percentage == 100 && "bg-primary")}>
           {percentage}%
         </Button>
       </header>

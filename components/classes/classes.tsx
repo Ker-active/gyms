@@ -4,56 +4,64 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { FloatingComponent } from "./floating-component";
 import { ClassInfo } from "./class-info";
 import Link from "next/link";
+import { IClassResponse } from "@/lib/types";
+import { memo, useMemo } from "react";
+import { format } from "date-fns";
 
-const timeTable = [
-  {
-    day: "Monday",
-    classes: [
-      {
-        name: "Yoga",
-        trainer: "John Doe",
-        time: "10am - 11am",
-      },
-      {
-        name: "Yoga",
-        trainer: "John Doe",
-        time: "10am - 11am",
-      },
-    ],
-  },
-  {
-    day: "Tuesday",
-    classes: [{ name: "Yoga", trainer: "John Doe", time: "10am - 11am" }],
-  },
-  {
-    day: "Wednesday",
-    classes: [{ name: "Yoga", trainer: "John Doe", time: "10am - 11am" }],
-  },
-  {
-    day: "Thurday",
-    classes: [{ name: "Yoga", trainer: "John Doe", time: "10am - 11am" }],
-  },
-  {
-    day: "Friday",
-    classes: [{ name: "Yoga", trainer: "John Doe", time: "10am - 11am" }],
-  },
-  {
-    day: "Saturday",
-    classes: [{ name: "Yoga", trainer: "John Doe", time: "10am - 11am" }],
-  },
-  {
-    day: "Sunday",
-    classes: [{ name: "Yoga", trainer: "John Doe", time: "10am - 11am" }],
-  },
-];
-
+const weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const backgrounds = ["bg-[#F3F3F3]", "bg-[#DFFFFF]", "bg-[#ECF1FF]", "bg-[#FFE7DA]"];
 
 interface IProps {
   isForTrainer?: boolean;
+  classDetails?: IClassResponse["data"];
 }
 
-export const Classes = ({ isForTrainer = false }: IProps) => {
+interface IClassArray {
+  day: string;
+  classes: {
+    name: string;
+    trainer: string;
+    time: string;
+    onlineLink: string;
+    classId: string;
+  }[];
+}
+
+function formatClass(classDetails: IClassResponse["data"]) {
+  if (!classDetails) return [];
+  return classDetails.reduce((acc, item) => {
+    const day = format(new Date(item.date), "EEEE");
+    const classDetails = {
+      name: item.title,
+      trainer: item.trainer?.fullname, // Get the trainer name
+      time: `${item.timeFrom} - ${item.timeTo}`,
+      classId: item._id,
+      onlineLink: item.onlineLink,
+    };
+
+    const existingDay = acc.find((d) => d.day === day);
+    if (existingDay) {
+      existingDay.classes.push(classDetails);
+    } else {
+      acc.push({
+        day,
+        classes: [classDetails],
+      });
+    }
+
+    return acc;
+  }, [] as IClassArray[]);
+}
+
+export const Classes = ({ isForTrainer = false, classDetails }: IProps) => {
+  const timeTable = useMemo(() => {
+    const groupedData = formatClass(classDetails || []);
+    return weekDays.map((day) => {
+      const foundDay = groupedData.find((d) => d.day === day);
+      return foundDay || { day, classes: [] };
+    });
+  }, [classDetails]);
+
   return (
     <section className="flex flex-col">
       {timeTable.map((day) => (
@@ -62,27 +70,27 @@ export const Classes = ({ isForTrainer = false }: IProps) => {
             <p>{day.day}</p>
           </div>
 
-          <div className="flex relative no-scrollbar  overflow-x-auto bg-white gap-[30px] px-4 w-full flex-row items-center">
+          <div className="flex relative [@media(max-width:600px)]:no-scrollbar   overflow-x-auto bg-white gap-[30px] sm:pt-1 px-4 w-full flex-row items-center">
             {day.classes.map((event, index) => {
               return (
                 <div className={cn("px-4  min-w-[195px] pb-[11px] pt-4 rounded-[16px]", isForTrainer && "h-[80px]", backgrounds[(index + timeTable.indexOf(day)) % backgrounds.length])} key={index}>
                   <div className="flex mb-2 flex-row items-center justify-between">
                     <p className="font-semibold">{event.name}</p>
-                    <FloatingComponent isForTrainer={isForTrainer} />
+                    <FloatingComponent onlineLink={event.onlineLink} _id={event.classId} isForTrainer={isForTrainer} />
                   </div>
                   <div className="flex mb-1 gap-2 items-center flex-row">
                     <Clock size={16} />
-                    <span className="text-sm">{event.time}</span>
+                    <span className="text-sm w-full line-clamp-1 text-ellipsis">{event.time}</span>
                   </div>
                   {!isForTrainer && (
                     <>
                       <div className="flex gap-2 mb-1 items-center flex-row">
                         <UserRound size={16} />
-                        <span className="text-sm">{event.trainer}</span>
+                        <span className="text-sm w-full line-clamp-1 text-ellipsis">{event.trainer}</span>
                       </div>
                       <div className="flex gap-2 items-center flex-row">
                         <User size={16} />
-                        <span className="text-sm">8/12</span>
+                        <span className="text-sm w-full">8/12</span>
                       </div>
                     </>
                   )}
@@ -95,3 +103,5 @@ export const Classes = ({ isForTrainer = false }: IProps) => {
     </section>
   );
 };
+
+Classes.displayName = "Classes";

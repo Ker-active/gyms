@@ -12,11 +12,11 @@ import { cn } from "@/lib";
  * styles that aligns with shadcn/ui
  */
 const controlStyles = {
-  base: "flex !min-h-9 w-full rounded-md border border-input bg-transparent pl-3 py-1 pr-1 gap-1 text-sm shadow-sm transition-colors hover:cursor-pointer",
-  focus: "outline-none ring-1 ring-ring",
+  base: "flex h-[45px] w-full rounded-md border border-input bg-transparent px-5  py-2 gap-1 text-sm shadow-sm transition-colors hover:cursor-pointer",
+  focus: "outline-none ring-2 ring-ring ring-offset-2",
   disabled: "cursor-not-allowed opacity-50",
 };
-const placeholderStyles = "text-sm text-muted-foreground";
+const placeholderStyles = "text-sm text-muted-foreground font-extralight";
 const valueContainerStyles = "gap-1";
 const multiValueStyles =
   "inline-flex items-center gap-2 rounded-md border border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 px-1.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2";
@@ -105,13 +105,14 @@ export const defaultStyles: StylesConfig<unknown, boolean, GroupBase<unknown>> =
 import * as React from "react";
 import type { ClearIndicatorProps, DropdownIndicatorProps, MenuListProps, MenuProps, MultiValueRemoveProps, OptionProps } from "react-select";
 import { components } from "react-select";
-import { CaretSortIcon, CheckIcon, Cross2Icon as CloseIcon } from "@radix-ui/react-icons";
+import { CheckIcon, Cross2Icon as CloseIcon } from "@radix-ui/react-icons";
 import { FixedSizeList as List } from "react-window";
+import { ChevronDown } from "lucide-react";
 
 const DropdownIndicator = (props: DropdownIndicatorProps) => {
   return (
     <components.DropdownIndicator {...props}>
-      <CaretSortIcon className={"h-4 w-4 opacity-50"} />
+      <ChevronDown className={"h-4 w-4 opacity-50"} />
     </components.DropdownIndicator>
   );
 };
@@ -193,6 +194,7 @@ export const Select = React.forwardRef<React.ElementRef<typeof SelectComponent>,
       components={{
         DropdownIndicator,
         ClearIndicator,
+        IndicatorSeparator: () => null,
         MultiValueRemove,
         Option,
         Menu,

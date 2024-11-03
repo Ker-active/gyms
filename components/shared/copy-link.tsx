@@ -3,8 +3,8 @@ import { BsCopy } from "react-icons/bs";
 import { Button } from "../ui/button";
 import { useClipboard } from "@/hooks";
 
-export const CopyLink = () => {
-  const { copyToClipboard } = useClipboard("https://www.ker.com");
+export const CopyLink: React.FC<{ link: string }> = ({ link }) => {
+  const { copyToClipboard } = useClipboard(link);
   return (
     <>
       <p className="text-[12px]">Copy Link</p>

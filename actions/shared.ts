@@ -10,11 +10,10 @@ export const server = createAxiosClient({
 });
 
 export const setCookie = (value: string) => {
-  cookies().set("kerUser", value, {
+  cookies().set("kerGym", value, {
     maxAge: 60 * 60 * 24 * 1,
     sameSite: "strict",
     path: "/",
-    httpOnly: true,
     secure: true,
   });
 };

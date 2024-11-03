@@ -13,9 +13,7 @@ export const RegisterSchema = LoginSchema.extend({
   fullname: z.string().min(1, { message: "Fullname is required." }),
   phoneNumber: z.string().min(1, { message: "Phone number is required." }),
   userType: z.string().min(1),
-  confirmPassword: z
-    .string()
-    .min(1, { message: "Confirm Password is required." }),
+  confirmPassword: z.string().min(1, { message: "Confirm Password is required." }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match.",
   path: ["confirmPassword"],
