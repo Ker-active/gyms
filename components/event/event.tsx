@@ -25,7 +25,7 @@ export const Event = <T extends ElementType = "li">({ as, callToActionButton, is
             <Image className="object-contain" alt="Fitness Event Image" fill src={event?.media[0]} />
           </div>
           <div className="px-[18px] flex flex-row justify-between items-center pt-[18px]">
-            <h3 className="font-bold text-lg">Core Cardio</h3>
+            <h3 className="font-bold text-lg">{event.title}</h3>
             <Button onClick={callToActionButton} style={{ boxShadow: "0px 4px 4px 0px #BED8FF40" }} variant="ghost" size="icon" className="bg-[#F4F2F2]  rounded-[10px] place-self-end">
               {isEdit ? <Pencil size={20} color="#1C1C1C" /> : <Bookmark size={24} color="#1C1C1C" />}
             </Button>

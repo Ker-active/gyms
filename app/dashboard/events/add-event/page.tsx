@@ -51,7 +51,7 @@ export default function Page() {
         }
         formData.append(key, value as any);
       });
-      return eventId ? client.put(`/event/edit/${eventId}`, formData) : client.post(`/class/create`, formData);
+      return eventId ? client.put(`/event/edit/${eventId}`, formData) : client.post(`/event/create`, formData);
     },
     onError: (error) => {
       showError(error);
@@ -60,7 +60,7 @@ export default function Page() {
       queryClient.invalidateQueries({
         queryKey: [CacheKeys.Events],
       });
-      toast.success("Class Added successfully");
+      toast.success("Saved successfully");
       router.back();
     },
   });

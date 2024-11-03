@@ -16,7 +16,7 @@ import { useRouter } from "nextjs-toploader/app";
 
 const fields: FormFieldType<TLogin> = [
   { name: "email", label: "Email address", placeholder: "Enter email address", type: "email" },
-  { name: "password", label: "Password", placeholder: "****", type: "password" },
+  { name: "password", label: "Password", placeholder: "****", type: "text" },
 ];
 
 export default function Login() {

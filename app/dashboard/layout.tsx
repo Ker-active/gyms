@@ -22,8 +22,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useLayoutEffect(() => {
-    if (data && !data.data.fullname) {
-      router.replace(Routes.complete);
+    if (data && !data.data.location) {
+      return router.replace(Routes.complete);
     }
     if (data && data?.data?.fullname && pathname.includes(Routes.complete)) {
       router.replace(Routes.home);

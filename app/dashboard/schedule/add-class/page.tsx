@@ -70,7 +70,7 @@ export default function Page() {
       queryClient.invalidateQueries({
         queryKey: [CacheKeys.CLASSES],
       });
-      toast.success("Class Added successfully");
+      toast.success("Saved successfully");
       router.back();
     },
   });

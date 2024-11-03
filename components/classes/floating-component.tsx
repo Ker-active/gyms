@@ -13,7 +13,7 @@ import { client } from "@/lib/api";
 interface IProps {
   isForTrainer?: boolean;
   onlineLink?: string;
-  _id: string;
+  _id?: string;
 }
 
 export const FloatingComponent = ({ isForTrainer = false, onlineLink = "online link", _id = "giberrish" }: IProps) => {
