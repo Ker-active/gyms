@@ -77,6 +77,10 @@ export default function Page() {
         formData.append("amenities", amenity);
       });
 
+      data.services.forEach((service) => {
+        formData.append("services", service);
+      });
+
       data.media.forEach((media) => {
         if (typeof media === "string") return; //for editing, do not append if it is a string
         formData.append("media", media);
