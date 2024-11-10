@@ -34,7 +34,6 @@ export default function Login() {
         }
         if (response.success) {
           router.replace(Routes.home);
-          router.replace(Routes.complete);
         }
       });
     });

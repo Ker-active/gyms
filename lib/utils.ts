@@ -1,9 +1,10 @@
-import { type ClassValue, clsx } from "clsx";
-import { isToday, isYesterday, format } from "date-fns";
-import { twMerge } from "tailwind-merge";
 import { Routes } from "./routes";
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 import { toast } from "sonner";
 import { InputProps } from "@/components/ui/input";
+import { format, isToday, isYesterday, parseISO, isSameDay } from "date-fns";
+import { IClassResponse } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -13,6 +14,7 @@ export enum CacheKeys {
   USER = "user",
   CLASSES = "classes",
   Events = "events",
+  Price = "price",
   Trainers = "trainers",
 }
 
@@ -66,7 +68,6 @@ export const calculateTime = (inputDateStr: string) => {
   // Assuming the input date string is in UTC format
   const inputDate = new Date(inputDateStr);
 
-  // Get current date
   const currentDate = new Date();
 
   // Set up date formats
@@ -77,9 +78,7 @@ export const calculateTime = (inputDateStr: string) => {
     year: "numeric",
   } as any;
 
-  // Check if it's today, tomorrow, or more than one day ago
   if (inputDate.getUTCDate() === currentDate.getUTCDate() && inputDate.getUTCMonth() === currentDate.getUTCMonth() && inputDate.getUTCFullYear() === currentDate.getUTCFullYear()) {
-    // Today: Convert to AM/PM format
     const ampmTime = inputDate.toLocaleTimeString("en-US", timeFormat);
     return ampmTime;
   } else if (inputDate.getUTCDate() === currentDate.getUTCDate() - 1 && inputDate.getUTCMonth() === currentDate.getUTCMonth() && inputDate.getUTCFullYear() === currentDate.getUTCFullYear()) {
@@ -101,4 +100,71 @@ export const calculateTime = (inputDateStr: string) => {
     const formattedDate = inputDate.toLocaleDateString("en-GB", dateFormat);
     return formattedDate;
   }
+};
+
+const weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+export interface ClassDetails {
+  name: string;
+  trainer: string;
+  time: string;
+  onLinkLink: string;
+  _id: string;
+}
+
+interface DayGroup {
+  day: string;
+  classes: ClassDetails[];
+}
+
+export const getClassesForDate = (data: IClassResponse["data"], targetDate: Date) => {
+  if (!data) return [];
+
+  const filteredData = data.filter((item) => isSameDay(parseISO(item.date), targetDate));
+
+  // Group filtered data by day of the week
+  const groupedData = filteredData.reduce<DayGroup[]>((acc, item) => {
+    const day = format(parseISO(item.date), "EEEE");
+
+    const classDetails = {
+      name: item.title,
+      onLinkLink: item.onlineLink,
+      _id: item._id,
+      trainer: item.trainer.fullname,
+      time: `${item.timeFrom} - ${item.timeTo}`,
+    };
+
+    const existingDay = acc.find((d) => d.day === day);
+    if (existingDay) {
+      existingDay.classes.push(classDetails);
+    } else {
+      acc.push({
+        day,
+        classes: [classDetails],
+      });
+    }
+
+    return acc;
+  }, []);
+
+  const timeTable = weekDays.map((day) => {
+    const foundDay = groupedData.find((d) => d.day === day);
+    return foundDay || { day, classes: [] };
+  });
+
+  return timeTable;
+};
+
+export const getClassesForDateArray = (data: IClassResponse["data"], targetDate: Date): ClassDetails[] => {
+  if (!data) return [];
+
+  return data
+    .filter((item) => isSameDay(parseISO(item.date), targetDate))
+    .map((item) => ({
+      name: item.title,
+      onLinkLink: item.onlineLink,
+      _id: item._id,
+      trainer: item.trainer.fullname,
+      time: `${item.timeFrom} - ${item.timeTo}`,
+    }));
 };

@@ -7,8 +7,8 @@ import { Input } from "../ui/input";
 const generalFields = [
   {
     name: "personalInformation.fullname",
-    label: "Full Name",
-    placeholder: "Enter fullname",
+    label: "Gym Name",
+    placeholder: "Enter gym name",
   },
   {
     name: "personalInformation.phoneNumber",

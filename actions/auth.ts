@@ -21,7 +21,7 @@ export async function login(values: TLogin) {
     const serverClient = createAxiosClient();
     const { data } = await serverClient.post("/user/login", values);
     setCookie(data.data.token);
-    return { success: "Success", amenities: data.data.amenities };
+    return { success: "Success" };
   } catch (error: any) {
     return { error: error.response.data.message };
   }

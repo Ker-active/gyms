@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Bell, Bookmark, SquareMenu, User } from "lucide-react";
 import Image from "next/image";
 import { ReactNode, useLayoutEffect, useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Link from "next/link";
 import { Routes } from "@/lib";
@@ -23,10 +22,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   useLayoutEffect(() => {
     if (data && !data.data.location) {
-      return router.replace(Routes.complete);
-    }
-    if (data && data?.data?.fullname && pathname.includes(Routes.complete)) {
-      router.replace(Routes.home);
+      return router.replace(Routes.profile);
     }
   }, [data, pathname]);
 
@@ -51,7 +47,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               <AvatarName useInNavbar data={data.data} />
             </PopoverTrigger>
             <PopoverContent className="rounded-[9px] min-[250px] flex flex-col px-[27px] gap-4" sideOffset={15} align="end">
-              <Link className="flex flex-row gap-2  items-center  text-[#565C78]" href={Routes.account}>
+              <Link className="flex flex-row gap-2  items-center  text-[#565C78]" href={Routes.profile}>
                 <User size={20} /> <span className="font-inter text-sm">My Account</span>
               </Link>
               <Link className="flex flex-row gap-2  items-center  text-[#565C78]" href={Routes.account}>
@@ -80,5 +76,3 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     </main>
   );
 }
-
-const UserAvatar = () => {};

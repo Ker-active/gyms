@@ -1,4 +1,4 @@
-import { TProfile } from "@/app/dashboard/complete/page";
+import { TProfile } from "@/app/dashboard/profile/page";
 import { cn } from "@/lib";
 import { useFormContext } from "react-hook-form";
 
@@ -10,7 +10,7 @@ export const Tag = <T,>({ value, name }: IProps<T>) => {
   const { watch, setValue, getValues } = useFormContext<TProfile>();
   return (
     <button
-      type='button'
+      type="button"
       onClick={() => {
         const services = getValues(name as any);
 
@@ -23,11 +23,7 @@ export const Tag = <T,>({ value, name }: IProps<T>) => {
           setValue(name as any, [...services, value]);
         }
       }}
-      className={cn(
-        "text-sm border hover:bg-slate-100 rounded-full text-[#909090] py-[9px] px-[24.5px]",
-        watch(name as any).includes(value) &&
-          "bg-primary text-white hover:bg-primary/90"
-      )}
+      className={cn("text-sm border hover:bg-slate-100 rounded-full text-[#909090] py-[9px] px-[24.5px]", watch(name as any).includes(value) && "bg-primary text-white hover:bg-primary/90")}
     >
       {value}
     </button>

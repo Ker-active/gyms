@@ -9,7 +9,7 @@ export enum Routes {
   "class-details" = "/dashboard/schedule/details",
   home = "/dashboard",
   pricing = "/dashboard/pricing",
-  complete = "/dashboard/complete",
+  profile = "/dashboard/profile",
   login = "/auth/login",
   register = "/auth/signup",
   reviews = "/dashboard/reviews",
@@ -17,4 +17,3 @@ export enum Routes {
   attendance = "/dashboard/attendance",
   message = "/dashboard/message",
 }
- 

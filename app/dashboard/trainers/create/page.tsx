@@ -1,6 +1,6 @@
 "use client";
 
-import { Media, PersonalInformation, ProfessionalSummary, Services } from "@/components/complete";
+import { Media, PersonalInformation, ProfessionalSummary, Services } from "@/components/profile";
 import { Certification } from "@/components/trainers";
 import { Photo } from "@/components/trainers/photo";
 import { Button } from "@/components/ui/button";

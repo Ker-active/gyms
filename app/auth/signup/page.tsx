@@ -75,7 +75,7 @@ export default function Signup() {
                 <FormItem>
                   <FormLabel>{field.label}</FormLabel>
                   <FormControl>
-                    <Input placeholder={field.placeholder} type={field.type as any} {...formField} />
+                    <Input {...field} {...formField} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

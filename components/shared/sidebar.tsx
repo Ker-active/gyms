@@ -42,6 +42,10 @@ const links = [
     label: "Pricing",
     icon: "/pricing.svg",
   },
+  {
+    label: "Profile",
+    icon: "/members.svg",
+  },
 ] as const;
 
 interface IProps extends HTMLAttributes<HTMLDivElement> {

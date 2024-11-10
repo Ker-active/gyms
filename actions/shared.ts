@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 const cookie = cookies();
 
 export const server = createAxiosClient({
-  Authorization: `Bearer ${cookie.get("kerUser")}`,
+  Authorization: `Bearer ${cookie.get("kerGym")}`,
 });
 
 export const setCookie = (value: string) => {
@@ -19,5 +19,5 @@ export const setCookie = (value: string) => {
 };
 
 export const clearCookie = () => {
-  cookies().delete("kerUser");
+  cookies().delete("kerGym");
 };
