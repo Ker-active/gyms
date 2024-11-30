@@ -99,7 +99,7 @@ export default function Page() {
         <form id="form" onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col  bg-white  px-[27px] py-[40px] rounded-[8px] gap-6  ">
           <div className="grid grid-cols-1 gap-[28px] sm:grid-cols-2">
             <FormInput<TClassSchema> placeholder="Example: CrossFit" label="Title" name="title" />
-            <FormSelect<TClassSchema> placeholder="Select" options={userData?.data.activities || []} label="Type" name="type" />
+            <FormSelect<TClassSchema> placeholder="Select" options={userData?.data.services || []} label="Type" name="type" />
 
             <FormReactSelect<TClassSchema>
               handleOnChange={(e) => {

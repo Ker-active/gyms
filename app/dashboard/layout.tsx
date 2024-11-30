@@ -71,7 +71,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       </header>
       <section className="h-[calc(100svh-70px)] overflow-hidden mt-[70px] flex flex-row w-full">
         <Sidebar className="hidden sm:block" />
-        <div className="px-4 sm:ml-[220px] overflow-y-auto py-6 flex-grow w-full lg:px-[48px] sm:py-[35px]">{children}</div>
+        {/* <div className="px-4 sm:ml-[220px] overflow-y-auto py-6 flex-grow w-full lg:px-[48px] sm:py-[35px]">{children}</div> */}
+        <div className="px-4 sm:ml-[220px] overflow-y-auto w-full flex-grow lg:px-[48px] pt-6 pb-24 sm:pt-[35px] sm:pb-[100px]">
+          <div className="max-w-[1120px]">{children}</div>
+        </div>
       </section>
     </main>
   );

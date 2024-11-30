@@ -100,7 +100,7 @@ export default function Page() {
             </div>
             <FormInput<TEventSchema> placeholder="Enter" label="Online Link" name="onlineLink" />
           </div>
-          <FormMedia />
+          <FormMedia label="Upload a banner" />
         </form>
       </Form>
     </section>

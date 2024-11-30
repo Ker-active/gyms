@@ -18,7 +18,7 @@ export const Trainers = ({ showAll = false }: IProps) => {
   const displayedData = (showAll ? data?.data : data?.data.slice(0, 4)) || [];
 
   return (
-    <ul className="grid grid-cols-auto-fit-four gap-x-[40px] gap-y-8 sm:gap-y-[60px]">
+    <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {displayedData.map((trainer, i) => (
         <li key={i} className="flex items-center sm:items-start flex-col">
           <div className="w-full min-w-[200px] max-w-[200px] border-[7px] overflow-hidden border-brand rounded-full h-[200px] relative bg-gray-200 flex items-center justify-center">

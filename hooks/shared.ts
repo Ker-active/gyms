@@ -52,7 +52,7 @@ export const useGetTrainer = (trainerId: string | null) => {
 
 export const useGetEvents = (status = "upcoming") => {
   return useQuery({
-    queryKey: [CacheKeys.Events],
+    queryKey: [CacheKeys.Events, status],
     queryFn: async () => {
       return client.get(`/events?status=${status}`).then((res) => res.data as Promise<IEventResponse>);
     },

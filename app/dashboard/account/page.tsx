@@ -1,5 +1,6 @@
 "use client";
 import { ClassBookings, PersonalInformation, UpcomingClasses } from "@/components/account";
+import { MyCalendar } from "@/components/calender/calender";
 
 export default function Page() {
   return (
@@ -23,11 +24,11 @@ export default function Page() {
 //   }
 // }, []);
 
-//   <MyCalendar height={rightElementHeight} />
-//         <div
-//           // ref={rightElementRef}
-//           className='flex rounded-[5px]   flex-col w-full gap-4'
-//         >
-//           <Subscription />
-//           <PersonalInformation />
-//         </div>
+// <MyCalendar height={rightElementHeight} />
+//       <div
+//         // ref={rightElementRef}
+//         className='flex rounded-[5px]   flex-col w-full gap-4'
+//       >
+//         <Subscription />
+//         <PersonalInformation />
+//       </div>

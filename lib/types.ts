@@ -18,6 +18,7 @@ export interface TUser {
   token: string;
   profilePhoto: string;
   location: string;
+  professionalSummary: string;
 }
 
 interface SocialMedia {

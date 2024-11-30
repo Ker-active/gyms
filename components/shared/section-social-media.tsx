@@ -1,32 +1,33 @@
 import { cn } from "@/lib";
-import Image from "next/image";
 import Link from "next/link";
 import { HTMLAttributes } from "react";
+import { BsGlobe, BsTelephone, BsTwitterX } from "react-icons/bs";
+import { MdOutlineMail } from "react-icons/md";
+import { FaInstagram } from "react-icons/fa";
 
-interface IProps extends HTMLAttributes<HTMLDivElement> {}
-export const SectionSocialMedia = ({ className, ...rest }: IProps) => {
+const iconMap = {
+  twitter: BsTwitterX,
+  instagram: FaInstagram,
+  email: MdOutlineMail,
+  phone: BsTelephone,
+  website: BsGlobe,
+};
+
+interface IProps extends HTMLAttributes<HTMLDivElement> {
+  data: Record<string, string>;
+}
+export const SectionSocialMedia = ({ data, className, ...rest }: IProps) => {
   return (
-    <div
-      className={cn("flex flex-row gap-6 items-center", className)}
-      {...rest}
-    >
-      <div className='flex flex-row gap-1 items-center'>
-        <Image
-          width={25}
-          height={25}
-          src={"/instagram.svg"}
-          alt='Instagram Icon'
-        />
-        <Link className='underline text-[#3385FF]' href='#'>
-          @kerfitness
-        </Link>
-      </div>
-      <div className='flex flex-row gap-1 items-center'>
-        <Image width={25} height={25} src={"/twitter.svg"} alt='Twitter Icon' />
-        <Link className='underline text-[#3385FF]' href='#'>
-          @kerfitness
-        </Link>
-      </div>
+    <div className={cn("flex flex-wrap flex-row gap-6 items-center", className)} {...rest}>
+      {Object.entries(data).map(([key, value], index) => {
+        const Icon = iconMap[key as keyof typeof iconMap];
+        return (
+          <Link key={index} href={value} target="_blank" rel="noreferrer" className="flex flex-row text-[#008080] underline gap-1 items-center">
+            <Icon />
+            <p className="text-base">{value}</p>
+          </Link>
+        );
+      })}
     </div>
   );
 };

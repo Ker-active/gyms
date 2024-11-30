@@ -1,4 +1,5 @@
 "use client";
+import { MyCalendar } from "@/components/calender/calender";
 import { Classes } from "@/components/classes";
 import { DateChange, LoadingComponent } from "@/components/shared";
 import { buttonVariants } from "@/components/ui/button";
@@ -36,6 +37,7 @@ export default function Class() {
           ) : (
             <div className="pb-6">
               <Classes classDetails={data?.data ?? []} />
+              {/* <MyCalendar height={400} /> */}
             </div>
           )}
         </>
