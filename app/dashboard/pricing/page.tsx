@@ -115,7 +115,7 @@ export default function Page() {
             ) : (
               <section
                 style={{
-                  gridTemplateColumns: "repeat(auto-fit, minmax(330px, 1fr))",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(330px, 1fr))",
                 }}
                 className="grid gap-6 "
               >

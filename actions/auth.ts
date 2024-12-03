@@ -10,7 +10,7 @@ export async function register(values: TRegister) {
     const serverClient = createAxiosClient();
     const { data } = await serverClient.post("/user/signup", values);
     setCookie(data.data.token);
-    return { success: "User Created, Please Login" };
+    return { success: "User Created\nPlease check your email to verify your account" };
   } catch (error: any) {
     return { error: error.response.data.message };
   }

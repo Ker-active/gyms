@@ -18,6 +18,6 @@ export const setCookie = (value: string) => {
   });
 };
 
-export const clearCookie = () => {
+export const clearCookie = async () => {
   cookies().delete("kerGym");
 };

@@ -17,8 +17,8 @@ import { useRouter } from "nextjs-toploader/app";
 const fields: FormFieldType<TRegister> = [
   {
     name: "fullname",
-    label: "Full Name",
-    placeholder: "Enter full name",
+    label: "Gym's Name",
+    placeholder: "Enter gym name",
     type: "text",
   },
   {
@@ -55,7 +55,7 @@ export default function Signup() {
         }
         if (response.success) {
           toast.success(response.success);
-          router.replace(Routes.home);
+          router.replace(Routes.login);
         }
       });
     });

@@ -6,7 +6,7 @@ import { Classes } from "@/components/classes";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "nextjs-toploader/app";
-import { useGetTrainer } from "@/hooks/shared";
+import { useGetClassDetails, useGetClasss, useGetTrainer } from "@/hooks/shared";
 
 const TrainersMedia = [
   {
@@ -34,7 +34,7 @@ const TrainersMedia = [
 export default function TrainersDetails({ params }: { params: { slug: string } }) {
   const router = useRouter();
   const { data, isPending } = useGetTrainer(params.slug);
-
+  // const { data: clas} = useGetClassDetails()
   return (
     <section className="flex min-h-full flex-col w-full font-inter gap-10">
       <header className="flex gap-4 flex-row items-center justify-between">
@@ -80,21 +80,24 @@ export default function TrainersDetails({ params }: { params: { slug: string } }
               </div>
             </article>
           </section>
-          <section className="flex flex-col gap-6">
-            <h2 className="section-header">Media</h2>
-            <section className="bg-white gap-4 grid-container p-4">
-              {data?.data.media.map((media, index) => (
-                <div key={index} className="relative border w-full">
-                  <Image fill src={media} alt="Trainer's media" />
-                </div>
-              ))}
-              {/* {TrainersMedia.map((trainer) => (
+          {(data?.data.media?.length || 0) > 0 && (
+            <section className="flex flex-col gap-6">
+              <h2 className="section-header">Media</h2>
+              <section className="bg-white gap-4 grid-container p-4">
+                {data?.data.media.map((media, index) => (
+                  <div key={index} className="relative border w-full">
+                    <Image fill src={media} alt="Trainer's media" />
+                  </div>
+                ))}
+                {/* {TrainersMedia.map((trainer) => (
                 <div key={trainer.grid} className={`relative w-full ${trainer.grid}`}>
                   <Image fill src={trainer.url} alt="Trainer's media" />
                 </div>
               ))} */}
+              </section>
             </section>
-          </section>
+          )}
+
           <section className="flex flex-col gap-6">
             <h2 className="section-header">Classes</h2>
             <Classes isForTrainer />
