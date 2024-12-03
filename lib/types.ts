@@ -64,6 +64,7 @@ export interface IClass {
   location: string;
   room: string;
   date: string;
+  price: string;
   timeFrom: string;
   timeTo: string;
   onlineLink: string;
