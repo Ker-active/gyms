@@ -19,6 +19,9 @@ export async function login(values: TLogin) {
   try {
     const serverClient = createAxiosClient();
     const { data } = await serverClient.post("/user/login", values);
+    if (!data.data.isVerified) {
+      return { error: "Please check your email to verify your account" };
+    }
     setCookie(data.data.token);
     return { success: "Success" };
   } catch (error: any) {
