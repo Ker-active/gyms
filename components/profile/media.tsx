@@ -10,7 +10,7 @@ export const Media = () => {
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
-    if (files && files.length < 2) return toast.error("Please select two or more files");
+    if (files && files.length < 1) return toast.error("Please select at least one media");
     form.setValue("media", [...Array.from(files as any)]);
   }
 
@@ -19,8 +19,9 @@ export const Media = () => {
 
   return (
     <article className="flex bg-white px-[20px] py-[15px] rounded-[8px] flex-col gap-4">
-      <header>
+      <header className="flex flex-row items-center gap-1">
         <h3 className="text-[#1C1939]  font-medium font-inter">Media</h3>
+        <span className="text-red-500">*</span>
       </header>
       <hr />
       {medias.length == 0 ? (

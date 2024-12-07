@@ -9,8 +9,9 @@ export const ProfessionalSummary = () => {
   const formSchema = useFormContext<TProfile>();
   return (
     <article className="flex bg-white px-[20px] py-[15px] rounded-[8px] flex-col gap-4">
-      <header>
+      <header className="flex flex-row items-center gap-1">
         <h3 className="text-[#1C1939] font-medium font-inter">Professional Summary</h3>
+        <span className="text-red-500">*</span>
       </header>
 
       <FormField

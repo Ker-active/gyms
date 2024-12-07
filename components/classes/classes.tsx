@@ -27,14 +27,23 @@ interface IClassArray {
   }[];
 }
 
+const convert24to12 = (time24: string) => {
+  if (!time24) return "";
+  const [hours, minutes] = time24.split(":");
+  const hour = parseInt(hours);
+  const ampm = hour >= 12 ? "pm" : "am";
+  const hour12 = hour % 12 || 12;
+  return `${hour12}:${minutes}${ampm}`;
+};
+
 function formatClass(classDetails: IClassResponse["data"]) {
   if (!classDetails) return [];
   return classDetails.reduce((acc, item) => {
     const day = format(new Date(item.date), "EEEE");
     const classDetails = {
       name: item.title,
-      trainer: item.trainer?.fullname, // Get the trainer name
-      time: `${item.timeFrom} - ${item.timeTo}`,
+      trainer: item.trainer?.fullname,
+      time: `${convert24to12(item.timeFrom)} - ${convert24to12(item.timeTo)}`,
       classId: item._id,
       onlineLink: item.onlineLink,
     };

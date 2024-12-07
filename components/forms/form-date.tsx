@@ -4,26 +4,37 @@ import * as React from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useFormContext, UseControllerProps } from "react-hook-form";
-import { cn } from "@/lib/utils";
+import { cn, isRequiredFn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useFormSchema } from "@/providers";
+import { z } from "zod";
 
 type DatePickerProps<T> = {
   name: keyof T;
   label?: string;
+  containerClassName?: React.HtmlHTMLAttributes<HTMLDivElement>["className"];
 } & UseControllerProps;
 
-export const FormDate = <T extends Record<string, any>>({ label = "Pick a date", name }: DatePickerProps<T>) => {
+export const FormDate = <T extends Record<string, any>>({ containerClassName, label = "Pick a date", name }: DatePickerProps<T>) => {
   const { control } = useFormContext();
+
+  const schema = useFormSchema() as z.ZodObject<any>;
+
+  const isRequired = isRequiredFn(schema, name);
 
   return (
     <FormField
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem>
-          {label && <FormLabel>{label}</FormLabel>}
+        <FormItem className={containerClassName}>
+          {label && (
+            <FormLabel>
+              {label} {isRequired && <span className="text-red-500">*</span>}
+            </FormLabel>
+          )}
           <Popover>
             <PopoverTrigger asChild>
               <FormControl>

@@ -2,11 +2,11 @@
 "use client";
 import { FormCheckBox, FormDate, FormInput, FormMedia, FormSelect } from "@/components/forms";
 import { SectionHeader } from "@/components/shared/section-header";
-import { Form, FormLabel } from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { useGetEventDetails } from "@/hooks/shared";
 import { CacheKeys, cn, showError } from "@/lib";
 import { client } from "@/lib/api";
-import { time } from "@/lib/time";
+import { FormSchemaProvider } from "@/providers";
 import { AddEventSchema, TEventSchema } from "@/schemas/dashboard";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -74,34 +74,33 @@ export default function Page() {
     <section className="flex flex-col font-inter gap-10">
       <SectionHeader containerClass="flex-row sm:flex-row items-center" disabled={isPending} type="submit" form="form" title={eventId ? "Edit Event" : "Add New Event"} rightElementText="Save Event" />
       <Form {...form}>
-        <form id="form" onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col  bg-white  px-[27px] py-[40px] rounded-[8px] gap-6  ">
-          <div className="grid grid-cols-1 gap-[28px] sm:grid-cols-2">
-            <FormInput<TEventSchema> placeholder="Example: CrossFit" label="Title" name="title" />
-            <FormInput<TEventSchema> placeholder="Enter" label="Available Slot" name="availableSlot" />
-            <FormInput<TEventSchema> placeholder="Enter" label="Location" name="location" />
-            <FormInput<TEventSchema> placeholder="Enter" label="Room" name="room" />
-            <FormDate<TEventSchema> name="date" />
-            <div className="space-y-2">
-              <FormLabel>Time</FormLabel>
-              <div className="flex flex-row gap-4 items-center">
-                <FormSelect<TEventSchema> options={time} name="timeFrom" />
-                <p>to</p>
-                <FormSelect<TEventSchema> options={time} name="timeTo" />
+        <FormSchemaProvider schema={AddEventSchema._def.schema}>
+          <form id="form" onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col  bg-white  px-[27px] py-[40px] rounded-[8px] gap-6  ">
+            <div className="grid grid-cols-1 gap-[28px] sm:grid-cols-2">
+              <FormInput<TEventSchema> placeholder="Example: CrossFit" label="Title" name="title" />
+              <FormInput<TEventSchema> placeholder="Enter" label="Available Slot" name="availableSlot" />
+              <FormInput<TEventSchema> placeholder="Enter" label="Location" name="location" />
+              <FormInput<TEventSchema> placeholder="Enter" label="Room" name="room" />
+              <FormDate<TEventSchema> name="date" />
+              <div className="flex flex-row gap-4 items-start">
+                <FormInput<TEventSchema> name="timeFrom" label="Time From" type="time" />
+                <p className="my-auto">to</p>
+                <FormInput<TEventSchema> name="timeTo" type="time" label="Time To" />
               </div>
+              <div className="flex flex-row gap-6 items-center w-full justify-between">
+                <FormInput<TEventSchema> disabled={form.watch("free")} type="number" containerClassName="w-full" placeholder="Enter" label="Price" name="price" />
+                <FormCheckBox<TEventSchema>
+                  containerClassName={cn("mt-auto mb-3", form?.formState?.errors?.price && "mb-9")}
+                  checkBoxProps={{ className: "w-[25px] h-[25px]" }}
+                  name="free"
+                  checkBoxLabel="Free?"
+                />
+              </div>
+              <FormInput<TEventSchema> placeholder="Enter" label="Online Link" name="onlineLink" />
             </div>
-            <div className="flex flex-row gap-6 items-center w-full justify-between">
-              <FormInput<TEventSchema> type="number" containerClassName="w-full" placeholder="Enter" label="Price" name="price" />
-              <FormCheckBox<TEventSchema>
-                containerClassName={cn("mt-auto mb-3", form?.formState?.errors?.price && "mb-9")}
-                checkBoxProps={{ className: "w-[25px] h-[25px]" }}
-                name="free"
-                checkBoxLabel="Free?"
-              />
-            </div>
-            <FormInput<TEventSchema> placeholder="Enter" label="Online Link" name="onlineLink" />
-          </div>
-          <FormMedia label="Upload a banner" />
-        </form>
+            <FormMedia label="Upload a banner" />
+          </form>
+        </FormSchemaProvider>
       </Form>
     </section>
   );

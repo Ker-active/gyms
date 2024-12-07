@@ -6,6 +6,7 @@ import { Form } from "@/components/ui/form";
 import { useGetUser } from "@/hooks/shared";
 import { CacheKeys, cn, showError } from "@/lib";
 import { client } from "@/lib/api";
+import { FormSchemaProvider } from "@/providers";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Info } from "lucide-react";
@@ -16,9 +17,9 @@ import { z } from "zod";
 
 const schema = z.object({
   personalInformation: z.object({
-    fullname: z.string().min(1, { message: "Gym Name is required." }),
+    fullname: z.string().min(1, { message: "Gym/Studio Name is required." }),
     phoneNumber: z.string().min(1, { message: "Phone number is required." }),
-    location: z.string().optional(),
+    location: z.string().min(1, { message: "Location is required." }),
     professionalSummary: z.string().min(1, { message: "Summary is required." }),
   }),
   socialMedia: z.object({
@@ -131,31 +132,33 @@ export default function Page() {
         </Button>
       </header>
       <Form {...form}>
-        <form className="flex flex-col gap-[30px]" id="form" onSubmit={form.handleSubmit(onSubmit)}>
-          <PersonalInformation
-            fields={[
-              {
-                name: "socialMedia.instagram",
-                label: "Instagram",
-                placeholder: "Full Instagram URL",
-              },
-              {
-                name: "socialMedia.twitter",
-                label: "X (twitter)",
-                placeholder: "Full X URL",
-              },
-              {
-                name: "socialMedia.website",
-                label: "Website",
-                placeholder: "https://url.com",
-              },
-            ]}
-          />
-          <ProfessionalSummary />
-          <Services />
-          <Amenities />
-          <Media />
-        </form>
+        <FormSchemaProvider schema={schema}>
+          <form className="flex flex-col gap-[30px]" id="form" onSubmit={form.handleSubmit(onSubmit)}>
+            <PersonalInformation
+              fields={[
+                {
+                  name: "socialMedia.instagram",
+                  label: "Instagram",
+                  placeholder: "Full Instagram URL",
+                },
+                {
+                  name: "socialMedia.twitter",
+                  label: "X (twitter)",
+                  placeholder: "Full X URL",
+                },
+                {
+                  name: "socialMedia.website",
+                  label: "Website",
+                  placeholder: "https://url.com",
+                },
+              ]}
+            />
+            <ProfessionalSummary />
+            <Services />
+            <Amenities />
+            <Media />
+          </form>
+        </FormSchemaProvider>
       </Form>
     </section>
   );

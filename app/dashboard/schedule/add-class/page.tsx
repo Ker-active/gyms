@@ -4,11 +4,11 @@
 import { FormCheckBox, FormDate, FormInput, FormMedia, FormSelect } from "@/components/forms";
 import { FormReactSelect } from "@/components/forms/form-react-select";
 import { SectionHeader } from "@/components/shared/section-header";
-import { Form, FormLabel } from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { useGetClassDetails, useGetTrainers, useGetUser } from "@/hooks/shared";
 import { CacheKeys, cn, showError } from "@/lib";
 import { client } from "@/lib/api";
-import { time } from "@/lib/time";
+import { FormSchemaProvider } from "@/providers";
 import { AddClassSchema, TClassSchema } from "@/schemas/dashboard";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -61,6 +61,7 @@ export default function Page() {
         }
         formData.append(key, value as any);
       });
+
       return classId ? client.put(`/class/edit/${classId}`, formData) : client.post(`/class/create`, formData);
     },
     onError: (error) => {
@@ -80,8 +81,8 @@ export default function Page() {
       form.reset({
         ...classDetails.data,
         availableSlot: classDetails.data.availableSlot.toString(),
-        price: classDetails.data.price.toString(),
-        room: classDetails.data.room.toString(),
+        price: classDetails.data?.price.toString(),
+        room: classDetails.data?.room.toString(),
         trainer: classDetails.data.trainer._id,
       });
     }
@@ -99,55 +100,57 @@ export default function Page() {
         rightElementText={classId ? "Update Class" : "Add Class"}
       />
       <Form {...form}>
-        <form id="form" onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col  bg-white  px-[27px] py-[40px] rounded-[8px] gap-6  ">
-          <div className="grid grid-cols-1 gap-[28px] sm:grid-cols-2">
-            <FormInput<TClassSchema> placeholder="Example: CrossFit" label="Title" name="title" />
-            <FormSelect<TClassSchema> placeholder="Select" options={userData?.data.services || []} label="Type" name="type" />
+        <FormSchemaProvider schema={AddClassSchema._def.schema}>
+          <form id="form" onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col  bg-white  px-[27px] py-[40px] rounded-[8px] gap-6  ">
+            <div className="grid grid-cols-1 place-items-start  gap-[28px] sm:grid-cols-2">
+              <FormInput<TClassSchema> containerClassName="w-full" placeholder="Example: CrossFit" label="Title" name="title" />
+              <FormSelect<TClassSchema> containerClassName="w-full" placeholder="Select" options={userData?.data.services || []} label="Type" name="type" />
 
-            <FormReactSelect<TClassSchema>
-              handleOnChange={(e) => {
-                form.setValue("trainer", e?.value);
-              }}
-              placeholder="Select"
-              options={trainersOptions}
-              label="Trainer"
-              name="trainer"
-            />
-
-            <FormInput<TClassSchema> placeholder="Enter" label="Available Slot" name="availableSlot" />
-            <FormInput<TClassSchema> placeholder="Enter" label="Location" name="location" />
-            <FormInput<TClassSchema> placeholder="Enter" label="Room" name="room" />
-            <FormDate<TClassSchema> name="date" />
-            <div className="space-y-2">
-              <FormLabel>Time</FormLabel>
-              <div className="flex flex-row gap-4 items-start">
-                <FormSelect<TClassSchema> options={time} name="timeFrom" />
-                <p className="my-auto">to</p>
-                <FormSelect<TClassSchema> options={time} name="timeTo" />
-              </div>
-            </div>
-            <div className="flex flex-row gap-6 items-center w-full justify-between">
-              <FormInput<TClassSchema> type="number" containerClassName="w-full" placeholder="Enter" label="Price" name="price" />
-              <FormCheckBox<TClassSchema>
-                containerClassName={cn("mt-auto mb-3", form?.formState?.errors?.price && "mb-9")}
-                checkBoxProps={{ className: "w-[25px] h-[25px]" }}
-                name="free"
-                checkBoxLabel="Free?"
+              <FormReactSelect<TClassSchema>
+                containerClassName="w-full"
+                handleOnChange={(e) => {
+                  form.setValue("trainer", e?.value);
+                }}
+                placeholder="Select"
+                options={trainersOptions}
+                label="Trainer"
+                name="trainer"
               />
+
+              <FormInput<TClassSchema> containerClassName="w-full" placeholder="Enter" label="Available Slot" name="availableSlot" />
+              <FormInput<TClassSchema> containerClassName="w-full" placeholder="Enter" label="Location" name="location" />
+              <FormInput<TClassSchema> containerClassName="w-full" placeholder="Enter" label="Room" name="room" />
+              <FormDate<TClassSchema> containerClassName="w-full" name="date" />
+
+              <div className={cn("flex flex-row gap-4 items-start")}>
+                <FormInput<TClassSchema> name="timeFrom" label="Time From" type="time" />
+                <p className={cn("mt-auto", form.formState.errors?.timeFrom || form.formState.errors.timeTo ? "mb-9" : "mb-3")}>to</p>
+                <FormInput<TClassSchema> name="timeTo" type="time" label="Time To" />
+              </div>
+
+              <div className="flex flex-row gap-6 items-center w-full justify-between">
+                <FormInput<TClassSchema> disabled={form.watch("free")} type="number" containerClassName="w-full" placeholder="Enter" label="Price" name="price" />
+                <FormCheckBox<TClassSchema>
+                  containerClassName={cn("mt-auto mb-3", form?.formState?.errors?.price && "mb-9")}
+                  checkBoxProps={{ className: "w-[25px] h-[25px]" }}
+                  name="free"
+                  checkBoxLabel="Free?"
+                />
+              </div>
+              <FormInput<TClassSchema> placeholder="Enter" containerClassName="w-full" label="Online Link" name="onlineLink" />
             </div>
-            <FormInput<TClassSchema> placeholder="Enter" label="Online Link" name="onlineLink" />
-          </div>
-          <FormInput<TClassSchema>
-            className="h-[200px] resize-none"
-            maxLength={200}
-            placeholder="Write something..."
-            label="Description"
-            isTextArea
-            name="description"
-            formDescription="Not more than 200 words"
-          />
-          <FormMedia label="Upload Picture of Class" />
-        </form>
+            <FormInput<TClassSchema>
+              className="h-[200px] resize-none"
+              maxLength={200}
+              placeholder="Write something..."
+              label="Description"
+              isTextArea
+              name="description"
+              formDescription="Not more than 200 words"
+            />
+            <FormMedia label="Upload Picture of Class" />
+          </form>
+        </FormSchemaProvider>
       </Form>
     </section>
   );

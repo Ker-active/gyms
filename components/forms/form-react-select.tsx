@@ -1,6 +1,9 @@
 import { Controller, UseControllerProps, useFormContext } from "react-hook-form";
 import { Select } from "../ui/react-select";
 import { FormItem, FormLabel } from "../ui/form";
+import { useFormSchema } from "@/providers";
+import { z } from "zod";
+import { isRequiredFn } from "@/lib";
 
 type Option = { label: string; value: string };
 
@@ -16,10 +19,17 @@ type IProps<T> = {
 
 export const FormReactSelect = <T extends Record<string, any>>({ label, labelClassName, name, containerClassName, placeholder = "Select...", handleOnChange, options, ...rest }: IProps<T>) => {
   const form = useFormContext();
+  const schema = useFormSchema() as z.ZodObject<any>;
+
+  const isRequired = isRequiredFn(schema, name);
 
   return (
     <FormItem className={containerClassName}>
-      {label && <FormLabel className={labelClassName}>{label}</FormLabel>}
+      {label && (
+        <FormLabel className={labelClassName}>
+          {label} {isRequired && <span className="text-red-500">*</span>}
+        </FormLabel>
+      )}
       <Controller
         control={form.control}
         name={name as any}

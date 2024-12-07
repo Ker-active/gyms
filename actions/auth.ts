@@ -8,8 +8,7 @@ export async function register(values: TRegister) {
   try {
     delete (values as any).confirmPassword;
     const serverClient = createAxiosClient();
-    const { data } = await serverClient.post("/user/signup", values);
-    setCookie(data.data.token);
+    await serverClient.post("/user/signup", values);
     return { success: "User Created\nPlease check your email to verify your account" };
   } catch (error: any) {
     return { error: error.response.data.message };

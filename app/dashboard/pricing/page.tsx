@@ -16,6 +16,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { client } from "@/lib/api";
 import { CacheKeys, showError } from "@/lib";
 import { toast } from "sonner";
+import { FormSchemaProvider } from "@/providers";
 
 const schema = z.object({
   _id: z.string().optional(),
@@ -91,14 +92,16 @@ export default function Page() {
             <DialogTitle>Add Price Package</DialogTitle>
           </DialogHeader>
           <Form {...form}>
-            <form className="space-y-[20px]" onSubmit={form.handleSubmit(onSubmit)}>
-              <FormInput<Schema> label="Package Name" name="packageName" placeholder="Example: CrossFit" />
-              <FormInput<Schema> isTextArea name="description" label="Description (Max:200 words)" />
-              <FormInput<Schema> type="number" label="Price" name="price" placeholder="Example: CrossFit" />
-              <Button disabled={creatingPrice} size="sm">
-                Done
-              </Button>
-            </form>
+            <FormSchemaProvider schema={schema}>
+              <form className="space-y-[20px]" onSubmit={form.handleSubmit(onSubmit)}>
+                <FormInput<Schema> label="Package Name" name="packageName" placeholder="Example: CrossFit" />
+                <FormInput<Schema> isTextArea name="description" label="Description (Max:200 words)" />
+                <FormInput<Schema> type="number" label="Price" name="price" placeholder="Example: CrossFit" />
+                <Button disabled={creatingPrice} size="sm">
+                  Done
+                </Button>
+              </form>
+            </FormSchemaProvider>
           </Form>
         </DialogContent>
       </Dialog>
@@ -117,7 +120,7 @@ export default function Page() {
                 style={{
                   gridTemplateColumns: "repeat(auto-fill, minmax(330px, 1fr))",
                 }}
-                className="grid gap-6 "
+                className="grid gap-6"
               >
                 {data?.data.map((plan) => (
                   <article className="border p-[30px] rounded-[7px] bg-white border-[#E2E2E2]" key={plan._id}>

@@ -3,6 +3,9 @@
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { useFormContext } from "react-hook-form";
 import { Input } from "../ui/input";
+import { useFormSchema } from "@/providers";
+import { z } from "zod";
+import { isRequiredFn} from "@/lib";
 
 const generalFields = [
   {
@@ -30,6 +33,7 @@ interface IProps {
 export const PersonalInformation = ({ fields }: IProps) => {
   const formSchema = useFormContext();
   const newFields = [...generalFields, ...fields];
+  const schema = useFormSchema() as z.ZodObject<any>;
   return (
     <article className="flex bg-white px-[20px] py-[15px] rounded-[8px] flex-col gap-4">
       <header>
@@ -37,22 +41,27 @@ export const PersonalInformation = ({ fields }: IProps) => {
       </header>
       <hr />
       <div className="grid gap-x-4 gap-y-[18px] grid-cols-1 sm:grid-cols-2">
-        {newFields.map((field) => (
-          <FormField
-            key={field.name}
-            control={formSchema.control}
-            name={field.name}
-            render={({ field: formField }) => (
-              <FormItem>
-                <FormLabel>{field.label}</FormLabel>
-                <FormControl>
-                  <Input className=" h-[50px]" {...field} {...formField} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        ))}
+        {newFields.map((field) => {
+          const isRequiredField = isRequiredFn(schema, field.name);
+          return (
+            <FormField
+              key={field.name}
+              control={formSchema.control}
+              name={field.name}
+              render={({ field: formField }) => (
+                <FormItem>
+                  <FormLabel>
+                    {field.label} {isRequiredField && <span className="text-red-500">*</span>}
+                  </FormLabel>
+                  <FormControl>
+                    <Input className=" h-[50px]" {...field} {...formField} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          );
+        })}
       </div>
     </article>
   );

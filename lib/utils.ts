@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { InputProps } from "@/components/ui/input";
 import { format, isToday, isYesterday, parseISO, isSameDay } from "date-fns";
 import { IClassResponse } from "./types";
+import { z } from "zod";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -17,6 +18,32 @@ export enum CacheKeys {
   Price = "price",
   Trainers = "trainers",
 }
+
+export const isFieldRequired = <T extends z.ZodType>(schema: any, path: string): boolean => {
+  try {
+    schema.partial({ [path]: true }).parse({ [path]: undefined });
+    return false;
+  } catch (error) {
+    return true;
+  }
+};
+
+export const isRequiredFn = (schema: any, name: string) => {
+  if (!schema) return false;
+
+  const pathParts = name.split(".");
+
+  let currentField: any = schema.shape; // Start with the top-level schema shape
+  for (const part of pathParts) {
+    currentField = currentField?.[part]?.shape || currentField?.[part];
+    if (!currentField) return false; // Field doesn't exist
+  }
+
+  // Check if the field is optional
+  const isOptional = currentField.isOptional?.() || currentField.safeParse(undefined).success || currentField.isNullable?.();
+
+  return !isOptional;
+};
 
 export const showError = (error: any) => {
   return toast.error(error.response.data.message);

@@ -4,8 +4,7 @@ import { AuthHeader } from "../../../components/auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../../../components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../../components/ui/form";
-import { Input } from "../../../components/ui/input";
+import { Form } from "../../../components/ui/form";
 import { FormFieldType } from "@/lib/utils";
 import { RegisterSchema, TRegister } from "@/schemas/auth";
 import { useTransition } from "react";
@@ -13,11 +12,13 @@ import { register } from "@/actions/auth";
 import { toast } from "sonner";
 import { Routes } from "@/lib";
 import { useRouter } from "nextjs-toploader/app";
+import { FormInput } from "@/components/forms";
+import { FormSchemaProvider } from "@/providers";
 
 const fields: FormFieldType<TRegister> = [
   {
     name: "fullname",
-    label: "Gym's Name",
+    label: "Gym/Studio Name",
     placeholder: "Enter gym name",
     type: "text",
   },
@@ -65,24 +66,13 @@ export default function Signup() {
     <>
       <AuthHeader desc="Already have an account?" title="Get started with ker Active" href={Routes.login} />
       <Form {...form}>
-        <form id="formId" onSubmit={form.handleSubmit(onSubmit)} className="space-y-[15px]">
-          {fields.map((field) => (
-            <FormField
-              key={field.name}
-              control={form.control}
-              name={field.name}
-              render={({ field: formField }) => (
-                <FormItem>
-                  <FormLabel>{field.label}</FormLabel>
-                  <FormControl>
-                    <Input {...field} {...formField} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          ))}
-        </form>
+        <FormSchemaProvider schema={RegisterSchema}>
+          <form id="formId" onSubmit={form.handleSubmit(onSubmit)} className="space-y-[15px]">
+            {fields.map((field) => (
+              <FormInput {...field} key={field.name} />
+            ))}
+          </form>
+        </FormSchemaProvider>
       </Form>
       <footer>
         <Button className="w-full" disabled={isPending} form="formId" type="submit">

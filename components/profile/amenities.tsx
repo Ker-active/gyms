@@ -3,6 +3,7 @@ import { Tag } from "./tag";
 import { TProfile } from "@/app/dashboard/profile/page";
 import { useState } from "react";
 import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 
 const AvailableAmenities = ["Changing area", "Bathroom", "Lockers", "Car park", "Towels", "mirrors"];
 
@@ -15,8 +16,9 @@ export const Amenities = () => {
 
   return (
     <article className="flex bg-white px-[20px] gap-[30px] py-[24px] rounded-[8px] flex-col ">
-      <header>
+      <header className="flex flex-row items-center gap-1">
         <h3 className="text-[#1C1939]  font-medium font-inter">Amenities</h3>
+        <span className="text-red-500">*</span>
       </header>
       <hr />
       <ul className="flex flex-row flex-wrap gap-x-[15px] gap-y-[20px]">
@@ -39,22 +41,27 @@ export const Amenities = () => {
       <div className="flex flex-col">
         <h3 className="text-[#1C1939] mb-4 font-inter">Not on the list? simply type into the box below</h3>
 
-        <Input
-          placeholder="Add new service"
-          className={"text-sm border h-[37px] w-[200px]  rounded-full text-[#909090] py-[9px] px-[24.5px]"}
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key == "Go") {
-              e.preventDefault();
-              setSpecialNeeds([...specialNeeds, e.currentTarget.value]);
-              form.setValue("amenities", [...form.getValues("amenities"), e.currentTarget.value]);
+        <div className="flex-row flex  gap-2 items-center">
+          <Input
+            placeholder="Add new amenities"
+            className={"text-sm border h-[37px] w-[200px]  rounded-full text-[#909090] py-[9px] px-[24.5px]"}
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+          />
+          <Button
+            type="button"
+            size="sm"
+            className="w-fit "
+            onClick={() => {
+              setSpecialNeeds([...specialNeeds, inputValue]);
+              form.setValue("amenities", [...form.getValues("amenities"), inputValue]);
               setInputValue("");
-            }
-          }}
-          enterKeyHint="done"
-        />
+            }}
+          >
+            Add
+          </Button>
+        </div>
       </div>
     </article>
   );
