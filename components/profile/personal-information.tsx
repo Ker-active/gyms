@@ -5,12 +5,12 @@ import { useFormContext } from "react-hook-form";
 import { Input } from "../ui/input";
 import { useFormSchema } from "@/providers";
 import { z } from "zod";
-import { isRequiredFn} from "@/lib";
+import { isRequiredFn } from "@/lib";
 
 const generalFields = [
   {
     name: "personalInformation.fullname",
-    label: "Gym's Name",
+    label: "Gym/Studio Name",
     placeholder: "Enter gym name",
   },
   {
