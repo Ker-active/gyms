@@ -48,6 +48,15 @@ export const Amenities = () => {
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === "Go") {
+                e.preventDefault();
+                setSpecialNeeds([...specialNeeds, e.currentTarget.value]);
+                form.setValue("amenities", [...form.getValues("amenities"), e.currentTarget.value]);
+                setInputValue("");
+              }
+            }}
+            enterKeyHint="done"
           />
           <Button
             type="button"

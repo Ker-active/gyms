@@ -46,6 +46,15 @@ export const Services = () => {
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === "Go") {
+                e.preventDefault();
+                setServices([...services, e.currentTarget.value]);
+                form.setValue("services", [...form.getValues("services"), e.currentTarget.value]);
+                setInputValue("");
+              }
+            }}
+            enterKeyHint="done"
           />
           <Button
             type="button"
