@@ -49,6 +49,8 @@ export default function Page() {
           });
           return;
         }
+        if (key == "price" && form.getValues("free") == true) return;
+
         formData.append(key, value as any);
       });
       return eventId ? client.put(`/event/edit/${eventId}`, formData) : client.post(`/event/create`, formData);
