@@ -6,6 +6,7 @@ import { Bookmark, Calendar, Clock, MapPin, Pencil, Share2, UserRound } from "lu
 import Image from "next/image";
 import { ElementType, ComponentPropsWithoutRef } from "react";
 import { format } from "date-fns";
+import { convert24to12 } from "@/lib";
 
 type EventProps<T extends ElementType> = {
   as?: T;
@@ -39,7 +40,7 @@ export const Event = <T extends ElementType = "li">({ as, callToActionButton, is
           <div className="flex items-center gap-2  flex-row">
             <Clock size={18} />
             <p>
-              {event?.timeFrom}-{event?.timeTo}
+              {convert24to12(event?.timeFrom)}-{convert24to12(event?.timeTo)}
             </p>
           </div>
           <div className="flex items-center gap-2  flex-row">

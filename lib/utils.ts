@@ -19,6 +19,15 @@ export enum CacheKeys {
   Trainers = "trainers",
 }
 
+export const convert24to12 = (time24: string) => {
+  if (!time24) return "";
+  const [hours, minutes] = time24.split(":");
+  const hour = parseInt(hours);
+  const ampm = hour >= 12 ? "pm" : "am";
+  const hour12 = hour % 12 || 12;
+  return `${hour12}:${minutes}${ampm}`;
+};
+
 export const isFieldRequired = <T extends z.ZodType>(schema: any, path: string): boolean => {
   try {
     schema.partial({ [path]: true }).parse({ [path]: undefined });
