@@ -15,6 +15,30 @@ export async function register(values: TRegister) {
   }
 }
 
+export async function resetPassword(value: { token: string; newPassword: string }) {
+  try {
+    const serverClient = createAxiosClient();
+    const { data } = await serverClient.post("/user/update/password", value);
+    return {
+      success: data.message,
+    };
+  } catch (error: any) {
+    return { error: error.response.data.message };
+  }
+}
+
+export async function forgotPassword(value: { email: string }) {
+  try {
+    const serverClient = createAxiosClient();
+    const { data } = await serverClient.post("/user/reset-password", value);
+    return {
+      success: data.message,
+    };
+  } catch (error: any) {
+    return { error: error.response.data.message };
+  }
+}
+
 export async function login(values: TLogin) {
   try {
     const serverClient = createAxiosClient();

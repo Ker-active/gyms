@@ -10,6 +10,8 @@ export enum Routes {
   home = "/dashboard",
   pricing = "/dashboard/pricing",
   profile = "/dashboard/profile",
+  forgotPassword = "/auth/forgot-password",
+  resetPassword = "/auth/reset-password",
   login = "/auth/login",
   register = "/auth/signup",
   reviews = "/dashboard/reviews",

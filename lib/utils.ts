@@ -67,7 +67,7 @@ export const getInitials = (name: string) => {
 };
 
 export const publicRoutes: string[] = [];
-export const authRoutes: string[] = [Routes.login, Routes.register];
+export const authRoutes: string[] = [Routes.login, Routes.register, Routes.forgotPassword, Routes.resetPassword];
 
 interface FormFieldTypeObject<T> extends Omit<Partial<InputProps>, "name"> {
   label: string;

@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "../../../components/ui/button";
 import { Form } from "../../../components/ui/form";
-import { FormFieldType } from "@/lib/utils";
+import { cn, FormFieldType } from "@/lib/utils";
 import { Routes } from "@/lib";
 import { useTransition } from "react";
 import { login } from "@/actions/auth";
@@ -14,6 +14,7 @@ import { LoginSchema, TLogin } from "@/schemas/auth";
 import { useRouter } from "nextjs-toploader/app";
 import { FormSchemaProvider } from "@/providers";
 import { FormInput } from "@/components/forms";
+import Link from "next/link";
 
 const fields: FormFieldType<TLogin> = [
   { name: "email", label: "Email address", placeholder: "Enter email address", type: "email" },
@@ -52,6 +53,9 @@ export default function Login() {
           </form>
         </FormSchemaProvider>
       </Form>
+      <Link className={cn("self-end underline text-sm")} href={Routes.forgotPassword}>
+        Forgot password?
+      </Link>
       <footer>
         <Button className="w-full" disabled={isPending} form="formId" type="submit">
           Login
