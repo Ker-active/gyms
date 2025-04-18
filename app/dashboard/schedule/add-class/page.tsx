@@ -83,7 +83,7 @@ export default function Page() {
       form.reset({
         ...classDetails.data,
         availableSlot: classDetails.data.availableSlot.toString(),
-        price: classDetails.data?.price.toString(),
+        price: classDetails.data?.price?.toString(),
         room: classDetails.data?.room.toString(),
         trainer: classDetails.data.trainer._id,
       });
@@ -119,9 +119,9 @@ export default function Page() {
                 name="trainer"
               />
 
-              <FormInput<TClassSchema> containerClassName="w-full" placeholder="Enter" label="Available Slot" name="availableSlot" />
+              <FormInput<TClassSchema> containerClassName="w-full" type="number" placeholder="Enter" label="Available Slot" name="availableSlot" />
               <FormInput<TClassSchema> containerClassName="w-full" placeholder="Enter" label="Location" name="location" />
-              <FormInput<TClassSchema> containerClassName="w-full" placeholder="Enter" label="Room" name="room" />
+              <FormInput<TClassSchema> containerClassName="w-full" type="number" placeholder="Enter" label="Room" name="room" />
               <FormDate<TClassSchema> containerClassName="w-full" name="date" />
 
               <div className={cn("flex flex-row gap-4 items-start")}>

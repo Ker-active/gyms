@@ -80,7 +80,10 @@ export default function Page() {
     mutate(values);
   }
 
-  function openModal() {
+  function openModal(isNew = false) {
+    if (isNew) {
+      resetFields();
+    }
     setIsModalOpen(true);
   }
 
@@ -107,7 +110,7 @@ export default function Page() {
       </Dialog>
 
       <section className="flex min-h-full flex-col w-full font-inter gap-10">
-        <SectionHeader onClick={openModal} rightElementText="Add New" title="Price Packages" />
+        <SectionHeader onClick={() => openModal(true)} rightElementText="Add New" title="Price Packages" />
 
         {isPending || !data ? (
           <LoadingComponent />

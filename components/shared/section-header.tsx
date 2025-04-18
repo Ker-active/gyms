@@ -10,9 +10,10 @@ interface IProps extends ButtonProps {
   rightElementNode?: React.ReactNode;
   rightElementText: string;
   containerClass?: string;
+  disabled?: boolean;
 }
 
-export const SectionHeader = ({ title, containerClass, rightElementText, hasRightElement = true, rightElementNode, ...rest }: IProps) => {
+export const SectionHeader = ({ title, containerClass, rightElementText, hasRightElement = true, rightElementNode, disabled, ...rest }: IProps) => {
   const router = useRouter();
   return (
     <header className={cn("flex flex-col gap-4 sm:flex-row items-start justify-between", containerClass)}>
@@ -28,7 +29,7 @@ export const SectionHeader = ({ title, containerClass, rightElementText, hasRigh
           {rightElementNode ? (
             rightElementNode
           ) : (
-            <Button size="sm" {...rest}>
+            <Button disabled={disabled} className={cn(disabled && "cursor-not-allowed opacity-50")} size="sm" {...rest}>
               {rightElementText}
             </Button>
           )}

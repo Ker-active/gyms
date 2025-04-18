@@ -80,9 +80,9 @@ export default function Page() {
           <form id="form" onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col  bg-white  px-[27px] py-[40px] rounded-[8px] gap-6  ">
             <div className="grid grid-cols-1 gap-[28px] sm:grid-cols-2">
               <FormInput<TEventSchema> placeholder="Example: CrossFit" label="Title" name="title" />
-              <FormInput<TEventSchema> placeholder="Enter" label="Available Slot" name="availableSlot" />
+              <FormInput<TEventSchema> placeholder="Enter"  type="number" label="Available Slot" name="availableSlot" />
               <FormInput<TEventSchema> placeholder="Enter" label="Location" name="location" />
-              <FormInput<TEventSchema> placeholder="Enter" label="Room" name="room" />
+              <FormInput<TEventSchema> placeholder="Enter" type="number" label="Room" name="room" />
               <FormDate<TEventSchema> name="date" />
               <div className="flex flex-row gap-4 items-start">
                 <FormInput<TEventSchema> name="timeFrom" label="Time From" type="time" />
