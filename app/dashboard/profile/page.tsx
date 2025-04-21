@@ -45,9 +45,9 @@ const calculatePercentage = (data: TProfile) => {
   if (personalInfoComplete) percentage += 25;
 
   // Check services, amenities, media
-  if (services.length >= 2) percentage += 25;
-  if (amenities.length >= 2) percentage += 25;
-  if (media.length >= 2) percentage += 25;
+  if (services.length >= 1) percentage += 25;
+  if (amenities.length >= 1) percentage += 25;
+  if (media.length >= 1) percentage += 25;
 
   return percentage;
 };
@@ -93,7 +93,6 @@ export default function Page() {
       showError(error);
     },
     onSuccess: (data) => {
-      console.log(data);
       queryClient.invalidateQueries({
         queryKey: [CacheKeys.USER],
       });
