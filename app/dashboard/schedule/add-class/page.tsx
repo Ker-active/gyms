@@ -80,11 +80,12 @@ export default function Page() {
 
   useEffect(() => {
     if (classDetails) {
+      console.log({ classDetails });
       form.reset({
         ...classDetails.data,
         availableSlot: classDetails.data.availableSlot.toString(),
-        price: classDetails.data?.price.toString(),
-        room: classDetails.data?.room.toString(),
+        price: classDetails.data?.price?.toString() || "",
+        room: classDetails.data?.room?.toString() || "",
         trainer: classDetails.data.trainer._id,
       });
     }

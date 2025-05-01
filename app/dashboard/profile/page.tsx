@@ -13,6 +13,8 @@ import { Info } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { Routes } from "@/lib";
+import { useRouter } from "nextjs-toploader/app";
 import { z } from "zod";
 
 const schema = z.object({
@@ -53,6 +55,8 @@ const calculatePercentage = (data: TProfile) => {
 };
 
 export default function Page() {
+  const router = useRouter();
+
   const { data: userData } = useGetUser();
   const queryClient = useQueryClient();
   const form = useForm<TProfile>({
@@ -97,6 +101,7 @@ export default function Page() {
         queryKey: [CacheKeys.USER],
       });
       toast.success("Profile updated successfully");
+      router.replace(Routes.home);
     },
   });
 

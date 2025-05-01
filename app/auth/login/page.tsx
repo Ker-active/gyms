@@ -18,7 +18,7 @@ import Link from "next/link";
 
 const fields: FormFieldType<TLogin> = [
   { name: "email", label: "Email address", placeholder: "Enter email address", type: "email" },
-  { name: "password", label: "Password", placeholder: "****", type: "text" },
+  { name: "password", label: "Password", placeholder: "****", type: "password" },
 ];
 
 export default function Login() {
