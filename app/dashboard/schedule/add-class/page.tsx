@@ -80,7 +80,6 @@ export default function Page() {
 
   useEffect(() => {
     if (classDetails) {
-      console.log({ classDetails });
       form.reset({
         ...classDetails.data,
         availableSlot: classDetails.data.availableSlot.toString(),
