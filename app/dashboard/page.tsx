@@ -2,7 +2,8 @@
 import { ClassInfo } from "@/components/classes/class-info";
 import { DateChange, LoadingComponent } from "@/components/shared";
 import { useGetClasss } from "@/hooks/shared";
-import { getClassesForDate, getClassesForDateArray } from "@/lib";
+import { getClassesForDate, getClassesForDateArray, Routes } from "@/lib";
+import Link from "next/link";
 import { useMemo } from "react";
 
 export default function Root() {
@@ -24,7 +25,12 @@ export default function Root() {
       </section>
       <section className="grid grid-cols gap-[20px] md:grid-cols-2">
         <article className="bg-white px-[20px] py-[33px]">
-          <h3 className="font-medium text-base">Tomorrow</h3>
+          <div className=" flex justify-between items-center">
+            <h3 className="font-medium text-base">Tomorrow</h3>
+            <Link className="flex flex-row gap-2  items-center  text-[#565C78] capitalize" href={Routes.schedule}>
+              <span className="font-inter text-sm">view classes</span>
+            </Link>
+          </div>
           <ClassInfo classes={classesInfo.tomorrow} className="py-[20px]" />
         </article>
         <article className="bg-white space-y-[21px] g px-[20px] py-[33px]">

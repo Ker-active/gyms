@@ -34,7 +34,7 @@ export default function Page({ params }: { params: { slug: string } }) {
         <header className="space-y-2 px-[34px] ">
           <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between">
             <p className="text-[#1C1939]  font-bold tracking-[0.5px] text-xl sm:text-2xl">
-              {data?.data.title} by {data.data.trainer.fullname}
+              {data?.data.title} by {data.data.trainer?.fullname}
             </p>
             <div className="flex gap-4 flex-row items-center">
               <AddMember />

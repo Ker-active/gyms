@@ -200,7 +200,7 @@ export const getClassesForDateArray = (data: IClassResponse["data"], targetDate:
       name: item.title,
       onLinkLink: item.onlineLink,
       _id: item._id,
-      trainer: item.trainer.fullname,
+      trainer: item.trainer?.fullname,
       time: `${item.timeFrom} - ${item.timeTo}`,
     }));
 };
