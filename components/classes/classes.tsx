@@ -24,6 +24,9 @@ interface IClassArray {
     time: string;
     onlineLink: string;
     classId: string;
+    totalBooked: string;
+    totalSlot: string;
+    availableSlot: string;
   }[];
 }
 
@@ -46,6 +49,9 @@ function formatClass(classDetails: IClassResponse["data"]) {
       time: `${convert24to12(item.timeFrom)} - ${convert24to12(item.timeTo)}`,
       classId: item._id,
       onlineLink: item.onlineLink,
+      totalBooked: item.totalBooked,
+      totalSlot: item.totalSlot,
+      availableSlot: item.availableSlot,
     };
 
     const existingDay = acc.find((d) => d.day === day);
@@ -99,7 +105,8 @@ export const Classes = ({ isForTrainer = false, classDetails }: IProps) => {
                       </div>
                       <div className="flex gap-2 items-center flex-row">
                         <User size={16} />
-                        <span className="text-sm w-full">8/12</span>
+                        {event.totalBooked}/{event.availableSlot}
+                        {/* <span className="text-sm w-full">8/12</span> */}
                       </div>
                     </>
                   )}

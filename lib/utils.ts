@@ -146,6 +146,9 @@ export interface ClassDetails {
   time: string;
   onLinkLink: string;
   _id: string;
+  totalBooked: string;
+  totalSlot: string;
+  availableSlot: string;
 }
 
 interface DayGroup {
@@ -168,6 +171,9 @@ export const getClassesForDate = (data: IClassResponse["data"], targetDate: Date
       _id: item._id,
       trainer: item.trainer.fullname,
       time: `${item.timeFrom} - ${item.timeTo}`,
+      totalBooked: item.totalBooked,
+      totalSlot: item.totalSlot,
+      availableSlot: item.availableSlot,
     };
 
     const existingDay = acc.find((d) => d.day === day);
@@ -193,7 +199,6 @@ export const getClassesForDate = (data: IClassResponse["data"], targetDate: Date
 
 export const getClassesForDateArray = (data: IClassResponse["data"], targetDate: Date): ClassDetails[] => {
   if (!data) return [];
-
   return data
     .filter((item) => isSameDay(parseISO(item.date), targetDate))
     .map((item) => ({
@@ -202,5 +207,8 @@ export const getClassesForDateArray = (data: IClassResponse["data"], targetDate:
       _id: item._id,
       trainer: item.trainer?.fullname,
       time: `${item.timeFrom} - ${item.timeTo}`,
+      totalBooked: item.totalBooked,
+      totalSlot: item.totalSlot,
+      availableSlot: item.availableSlot,
     }));
 };

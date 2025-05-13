@@ -1,6 +1,7 @@
 "use client";
 import { ClassInfo } from "@/components/classes/class-info";
 import { DateChange, LoadingComponent } from "@/components/shared";
+import { Button } from "@/components/ui/button";
 import { useGetClasss } from "@/hooks/shared";
 import { getClassesForDate, getClassesForDateArray, Routes } from "@/lib";
 import Link from "next/link";
@@ -27,11 +28,17 @@ export default function Root() {
         <article className="bg-white px-[20px] py-[33px]">
           <div className=" flex justify-between items-center">
             <h3 className="font-medium text-base">Tomorrow</h3>
-            <Link className="flex flex-row gap-2  items-center  text-[#565C78] capitalize" href={Routes.schedule}>
-              <span className="font-inter text-sm">view classes</span>
-            </Link>
           </div>
           <ClassInfo classes={classesInfo.tomorrow} className="py-[20px]" />
+          <div className="">
+            {classesInfo.tomorrow.length >= 6 ? (
+              <Link className="flex justify-center items-center  text-[#565C78] capitalize" href={Routes.schedule}>
+                <Button>
+                  <span className="font-inter text-sm capitalize">load more</span>
+                </Button>
+              </Link>
+            ) : null}
+          </div>
         </article>
         <article className="bg-white space-y-[21px] g px-[20px] py-[33px]">
           <header className="flex flex-row items-center justify-between">
