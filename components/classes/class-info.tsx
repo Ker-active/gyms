@@ -32,7 +32,9 @@ export const ClassInfo = ({ className, classes = [], ...rest }: IProps) => {
               </div>
               <div className="flex gap-2 items-center flex-row">
                 <User size={16} />
-                <span className="text-sm">8/12</span>
+                <span className="text-sm">
+                  {event.totalBooked}/{event.availableSlot}
+                </span>
               </div>
             </li>
           ))}

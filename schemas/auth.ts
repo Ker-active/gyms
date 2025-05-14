@@ -1,10 +1,14 @@
 import { z } from "zod";
 
+export const USER_TYPES = ["GYMS", "TRAINERS", "USERS"] as const;
+export type TUserType = (typeof USER_TYPES)[number];
+
 export const LoginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6, {
     message: "Password must be at least 6 characters long.",
   }),
+  userType: z.enum(USER_TYPES).default("GYMS"),
 });
 
 export type TLogin = z.infer<typeof LoginSchema>;

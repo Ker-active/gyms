@@ -73,4 +73,6 @@ export interface IClass {
   media: string[];
   createdAt: string;
   __v: number;
+  totalBooked: string;
+  totalSlot: string;
 }
