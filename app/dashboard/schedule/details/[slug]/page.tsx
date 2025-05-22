@@ -60,7 +60,6 @@ export default function Page({ params }: { params: { slug: string } }) {
 
   if (error) return <p>An error has occurred</p>;
   if (isLoading || !data) return <LoadingComponent />;
-  console.log({ s: data?.data });
 
   return (
     <section className="flex flex-col font-inter gap-10">
