@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, Pencil, Share2, User } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CopyLink, LoadingComponent } from "@/components/shared";
-import { Routes } from "@/lib";
+import { CacheKeys, Routes, showError } from "@/lib";
 import Link from "next/link";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { z } from "zod";
@@ -14,13 +14,49 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { FormInput } from "@/components/forms";
 import { useState } from "react";
-import { useGetClassDetails } from "@/hooks/shared";
+import { useGetClassDetailBookingList, useGetClassDetails } from "@/hooks/shared";
 import { format } from "date-fns";
 import { useRouter } from "nextjs-toploader/app";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { client } from "@/lib/api";
+import { TBookingAttendedResponse } from "@/lib/types";
 
 export default function Page({ params }: { params: { slug: string } }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { data, isLoading, error } = useGetClassDetails(params!?.slug);
+
+  const classId = data?.data?._id;
+  const gymId = data?.data?.gym;
+
+  const { data: bookings, isLoading: isLoadingBooking } = useGetClassDetailBookingList(classId ?? "", gymId ?? "");
+
+  const { mutate: markAttended, isPending: markAttendedPending } = useMutation({
+    mutationFn: (data: { bookingId: string; attended: boolean }) => {
+      return client.put(`/bookings/${data.bookingId}/attendance`);
+    },
+    onError: (error) => {
+      showError(error);
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: [CacheKeys.Books, classId, gymId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [CacheKeys.Members],
+      });
+
+      toast.success(data.data.message || "Attendance updated successfully");
+    },
+  });
+
+  const handleAttendanceChange = (bookingId: string, currentAttended: boolean) => {
+    const newAttendedStatus = !currentAttended;
+    markAttended({ bookingId, attended: newAttendedStatus });
+  };
 
   if (error) return <p>An error has occurred</p>;
   if (isLoading || !data) return <LoadingComponent />;
@@ -69,21 +105,35 @@ export default function Page({ params }: { params: { slug: string } }) {
           <h3 className="font-semibold">Description</h3>
           <p className="text-[#737373] leading-[30px]">{data.data.description}</p>
         </article>
-        <article className="space-y-2 py-[35px] text-[#1C1939] px-[34px] ">
+
+        <article className="space-y-2 py-[35px] text-[#1C1939] px-[34px]">
           <h3 className="font-semibold">Booked</h3>
-          <div className="flex gap-[20px]  overflow-x-auto flex-col">
-            {Array.from({ length: 2 }).map((_, i) => (
-              <div className="bg-[#F8F7FA] text-[#767676] py-[20px] flex flex-row items-center justify-between gap-4 px-6  text-sm  rounded-[8px]" key={i}>
-                <p>Ifeanyi Chisom</p>
-                <p>Sept 16,2024</p>
-                <div className="flex flex-row items-center gap-1">
-                  <Checkbox className="border-[#737373] rounded-full" id="attendance" />
-                  <label htmlFor="attendance" className="text-[#767676] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                    Attended
-                  </label>
-                </div>
-              </div>
-            ))}
+          <div className="flex gap-[20px] overflow-x-auto flex-col">
+            <Table className="border-separate border-spacing-y-5">
+              <TableBody>
+                {bookings?.data.map((book) => (
+                  <TableRow key={book._id} className="hover:bg-transparent border-0">
+                    <TableCell className="bg-[#F8F7FA] text-[#767676] py-[20px] px-6 text-sm rounded-l-[8px] border-0">{book.user.fullname}</TableCell>
+                    <TableCell className="bg-[#F8F7FA] text-[#767676] py-[20px] px-6 text-sm border-0">{format(new Date(book.bookingDate), "MMM d, yyyy")}</TableCell>
+                    <TableCell className="bg-[#F8F7FA] text-[#767676] py-[20px] px-6 text-sm rounded-r-[8px] border-0">
+                      <div className="flex flex-row items-center gap-1">
+                        <Checkbox
+                          className="border-[#737373] rounded-full"
+                          id={`attendance-${book._id}`}
+                          checked={book.attended ?? false}
+                          // disabled={book.attended === true}
+                          disabled={markAttendedPending}
+                          onCheckedChange={() => handleAttendanceChange(book._id, book.attended ?? false)}
+                        />
+                        <label htmlFor={`attendance-${book._id}`} className="text-[#767676] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                          Attended
+                        </label>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </article>
       </section>

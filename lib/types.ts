@@ -75,4 +75,71 @@ export interface IClass {
   __v: number;
   totalBooked: string;
   totalSlot: string;
+  gym?: string;
+}
+
+export interface IBookingResponse {
+  success: boolean;
+  data: Booking[];
+  pagination: Pagination;
+  message: string;
+}
+
+interface User {
+  _id: string;
+  fullname: string;
+  email: string;
+}
+
+interface Booking {
+  _id: string;
+  user: User;
+  class: IClass;
+  bookingDate: string;
+  createdAt: string;
+  __v: number;
+  attended?: boolean;
+}
+
+interface Pagination {
+  currentPage: number;
+  totalPages: number;
+  pageSize: number;
+  totalRecords: number;
+}
+
+export interface TBookingAttendedResponse {
+  success: boolean;
+  message: string;
+  data: {
+    attended: boolean;
+    _id: string;
+    user: string;
+    class: {
+      _id: string;
+      title: string;
+      classType: string;
+      type: string;
+      trainer: string;
+      availableSlot: number;
+      totalSlots: number;
+      totalBooked: number;
+      location: string;
+      room: number;
+      date: string;
+      timeFrom: string;
+      timeTo: string;
+      onlineLink: string;
+      free: boolean;
+      description: string;
+      media: string[];
+      createdBy: string;
+      createdAt: string;
+      __v: number;
+      gym: string;
+    };
+    bookingDate: string;
+    createdAt: string;
+    __v: number;
+  };
 }

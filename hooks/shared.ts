@@ -1,6 +1,6 @@
 import { CacheKeys } from "@/lib";
 import { client } from "@/lib/api";
-import { IClass, IClassResponse, IEvent, IEventResponse, TUser } from "@/lib/types";
+import { IBookingResponse, IClass, IClassResponse, IEvent, IEventResponse, TUser } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetUser = () => {
@@ -28,6 +28,20 @@ export const useGetClassDetails = (classId: string | null) => {
       return client.get(`/class/view/${classId}`).then((res) => res.data as Promise<{ data: IClass }>);
     },
     enabled: !!classId,
+  });
+};
+
+export const useGetClassDetailBookingList = (
+  classId: string | null,
+  gymId: string | null
+) => {
+  return useQuery({
+    queryKey: [CacheKeys.Books, classId, gymId],
+    queryFn: async () => {
+      const res = await client.get(`/bookings/gym/${gymId}/class/${classId}`);
+      return res.data as IBookingResponse;
+    },
+    enabled: !!classId && !!gymId,
   });
 };
 
