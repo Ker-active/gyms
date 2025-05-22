@@ -60,6 +60,7 @@ export default function Page({ params }: { params: { slug: string } }) {
 
   if (error) return <p>An error has occurred</p>;
   if (isLoading || !data) return <LoadingComponent />;
+  console.log({ s: data?.data });
 
   return (
     <section className="flex flex-col font-inter gap-10">
@@ -97,7 +98,7 @@ export default function Page({ params }: { params: { slug: string } }) {
             <h3 className="text-[#008080]  font-semibold font-inter">
               {format(new Date(data.data.date), "EEEE, MMMM d")}, {data.data.timeFrom} - {data.data.timeTo}
             </h3>
-            <p className="text-sm flex flex-row items-center gap-1 text-[#737373]">{data.data.availableSlot} slots available</p>
+            <p className="text-sm flex flex-row items-center gap-1 text-[#737373]">{data.data.totalSlots} slots available</p>
           </div>
         </header>
         <hr className="mt-2" />

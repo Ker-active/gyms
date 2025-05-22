@@ -75,7 +75,8 @@ export interface IClass {
   __v: number;
   totalBooked: string;
   totalSlot: string;
-  gym?: string;
+  totalSlots:string;
+  gym: string;
 }
 
 export interface IBookingResponse {
