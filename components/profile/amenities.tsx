@@ -1,18 +1,39 @@
 import { useFormContext } from "react-hook-form";
 import { Tag } from "./tag";
 import { TProfile } from "@/app/dashboard/profile/page";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { useGetAmenitiesList, useGetSpecialNeedsList } from "@/hooks/useProfileOptionsList";
 
 const AvailableAmenities = ["Changing area", "Bathroom", "Lockers", "Car park", "Towels", "mirrors"];
 
 const AvailableSpecialNeeds = ["Wheelchair Accessibility", "Disability Friendly", "Pre-natal Friendly"];
 
 export const Amenities = () => {
-  const [specialNeeds, setSpecialNeeds] = useState(AvailableSpecialNeeds);
+  const { data: amenitiesData, isLoading: loadingAmenities, isError: errorAmenities } = useGetAmenitiesList();
+  const { data: specialNeedsData, isLoading: loadingSpecialNeeds, isError: errorSpecialNeeds } = useGetSpecialNeedsList();
+
   const form = useFormContext<TProfile>();
+
+  const [amenities, setAmenities] = useState<string[]>(AvailableAmenities);
+  const [specialNeeds, setSpecialNeeds] = useState<string[]>(AvailableSpecialNeeds);
   const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    if (amenitiesData?.data) {
+      setAmenities(amenitiesData.data.map((item) => item.ServiceName /* or .AmenityName */));
+    }
+  }, [amenitiesData]);
+
+  useEffect(() => {
+    if (specialNeedsData?.data) {
+      setSpecialNeeds(specialNeedsData.data.map((item) => item.ServiceName));
+    }
+  }, [specialNeedsData]);
+
+  if (loadingAmenities || loadingSpecialNeeds) return <p>Loading options…</p>;
+  if (errorAmenities || errorSpecialNeeds) return <p>Failed to load profile options.</p>;
 
   return (
     <article className="flex bg-white px-[20px] gap-[30px] py-[24px] rounded-[8px] flex-col ">
@@ -22,7 +43,7 @@ export const Amenities = () => {
       </header>
       <hr />
       <ul className="flex flex-row flex-wrap gap-x-[15px] gap-y-[20px]">
-        {AvailableAmenities.map((service) => (
+        {amenities.map((service) => (
           <li key={service}>
             <Tag<TProfile> name="amenities" value={service} />
           </li>

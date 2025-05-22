@@ -2,7 +2,7 @@
 
 import { Empty, LoadingComponent, SectionHeader } from "@/components/shared";
 import { Button } from "@/components/ui/button";
-import { Delete } from "lucide-react";
+import { Delete, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -85,7 +85,7 @@ export default function Page() {
   }
 
   return (
-    <>
+    <div className="w-full">
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
           <DialogHeader>
@@ -106,7 +106,7 @@ export default function Page() {
         </DialogContent>
       </Dialog>
 
-      <section className="flex min-h-full flex-col w-full font-inter gap-10">
+      <section className="flex min-h-full flex-col w-full font-inter gap-10 ">
         <SectionHeader onClick={openModal} rightElementText="Add New" title="Price Packages" />
 
         {isPending || !data ? (
@@ -152,7 +152,7 @@ export default function Page() {
                         size="icon"
                         className="min-w-[45px] bg-[#F4F2F2] h-[45px] rounded-[10px]"
                       >
-                        <Delete size={26} color="#1C1C1C" />
+                        <Trash2 size={32} strokeWidth={1} width={40} color="#1C1C1C" />
                       </Button>
                     </div>
                   </article>
@@ -162,6 +162,6 @@ export default function Page() {
           </>
         )}
       </section>
-    </>
+    </div>
   );
 }
