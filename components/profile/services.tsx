@@ -1,9 +1,10 @@
 import { useFormContext } from "react-hook-form";
 import { Tag } from "./tag";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { TProfile } from "@/app/dashboard/profile/page";
 import { Button } from "../ui/button";
+import { useGetServicesList } from "@/hooks/useProfileOptionsList";
 
 const AvailableServices = [
   "Running Coach",
@@ -20,9 +21,20 @@ const AvailableServices = [
   "Pilates Instructor",
 ];
 export const Services = () => {
-  const [services, setServices] = useState(AvailableServices);
+  const { data, isLoading, isError } = useGetServicesList();
   const form = useFormContext<TProfile>();
+
+  const [services, setServices] = useState<string[]>(AvailableServices);
   const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+    if (data?.data) {
+      setServices(data.data.map((svc) => svc.ServiceName));
+    }
+  }, [data]);
+
+  if (isLoading) return <p>Loading services…</p>;
+  if (isError) return <p>Couldn’t load services.</p>;
 
   return (
     <article className="flex bg-white px-[20px] gap-[30px] py-[24px] rounded-[8px] flex-col ">

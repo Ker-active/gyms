@@ -125,9 +125,9 @@ export default function Page() {
               <FormDate<TClassSchema> containerClassName="w-full" name="date" />
 
               <div className={cn("flex flex-row gap-4 items-start")}>
-                <FormInput<TClassSchema> name="timeFrom" label="Time From (GMT)" type="time" />
+                <FormInput<TClassSchema> name="timeFrom" label="Time From (WAT)" type="time" />
                 <p className={cn("mt-auto", form.formState.errors?.timeFrom || form.formState.errors.timeTo ? "mb-9" : "mb-3")}>to</p>
-                <FormInput<TClassSchema> name="timeTo" type="time" label="Time To (GMT)" />
+                <FormInput<TClassSchema> name="timeTo" type="time" label="Time To (WAT)" />
               </div>
 
               <div className="flex flex-row gap-6 items-center w-full justify-between">
