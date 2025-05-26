@@ -31,10 +31,7 @@ export const useGetClassDetails = (classId: string | null) => {
   });
 };
 
-export const useGetClassDetailBookingList = (
-  classId: string | null,
-  gymId: string | null
-) => {
+export const useGetClassDetailBookingList = (classId: string | null, gymId: string | null) => {
   return useQuery({
     queryKey: [CacheKeys.Books, classId, gymId],
     queryFn: async () => {
@@ -61,6 +58,16 @@ export const useGetTrainer = (trainerId: string | null) => {
       return client.get(`/trainers/${trainerId}`).then((res) => res.data as Promise<{ data: TUser }>);
     },
     enabled: !!trainerId,
+  });
+};
+
+export const useGetGymTrainer = (gymId: string | null) => {
+  return useQuery({
+    queryKey: [`${CacheKeys.Trainers}/gym`, gymId],
+    queryFn: async () => {
+      return client.get(`/gym/${gymId}/trainers`).then((res) => res.data as Promise<{ data: TUser[] }>);
+    },
+    enabled: !!gymId,
   });
 };
 

@@ -12,10 +12,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/forms";
 import { useRouter } from "nextjs-toploader/app";
-import { useGetTrainers } from "@/hooks/shared";
+import { useGetTrainers, useGetUser } from "@/hooks/shared";
 import { TUser } from "@/lib/types";
 import { toast } from "sonner";
 import { AvatarName } from "@/components/shared";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { CacheKeys, cn, showError } from "@/lib";
+import { client } from "@/lib/api";
 
 const Schema = z.object({
   email: z.string().optional(),
@@ -25,12 +28,34 @@ type TSchema = z.infer<typeof Schema>;
 
 export default function Page() {
   const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const { data: profile, isLoading } = useGetUser();
   const { data } = useGetTrainers();
   const [filteredTrainers, setFilteredTrainers] = useState([] as TUser[]);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
   const form = useForm<TSchema>({
     resolver: zodResolver(Schema),
     mode: "onBlur",
+  });
+
+  const { mutate: assignTrainer, isPending: isAssigning } = useMutation({
+    mutationFn: (trainerData: { email: string; trainerId: string }) => {
+      return client.post(`trainer/assign-to-gym`, trainerData);
+    },
+    onError: (error) => {
+      showError(error);
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: [`${CacheKeys.Trainers}/gym`, profile?.data._id!],
+      });
+      toast.success(data?.data?.message);
+      setIsPopoverOpen(false);
+      form.reset();
+      setFilteredTrainers([]);
+    },
   });
 
   function onSubmit(values: TSchema) {
@@ -42,6 +67,13 @@ export default function Page() {
     setFilteredTrainers(filtered);
     setIsPopoverOpen(true);
   }
+
+  const handleAddTrainer = (trainer: TUser) => {
+    assignTrainer({
+      email: trainer.email,
+      trainerId: trainer._id,
+    });
+  };
 
   return (
     <section className="flex min-h-full flex-col font-inter gap-10">
@@ -69,7 +101,12 @@ export default function Page() {
                   {filteredTrainers.map((user, index) => (
                     <li className="flex flex-row justify-between py-[10px] items-center px-4 hover:bg-[#F9F9F9] hover:border-l-2 hover:border-primary transition-all duration-200 group" key={index}>
                       <AvatarName data={user} />
-                      <Button className="italic text-sm text-primary sm:opacity-0  opacity-100 sm:group-hover:opacity-100 transition-opacity duration-200" variant="link">
+                      <Button
+                        className="italic text-sm text-primary sm:opacity-0  opacity-100 sm:group-hover:opacity-100 transition-opacity duration-200"
+                        variant="link"
+                        onClick={() => handleAddTrainer(user)}
+                        disabled={isAssigning}
+                      >
                         Add
                       </Button>
                     </li>
