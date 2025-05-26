@@ -52,6 +52,7 @@ export default function Page() {
     mutationFn: (data: TClassSchema) => {
       const formData = new FormData();
       Object.entries(data).forEach(([key, value]) => {
+        if (value === undefined) return;
         if (key == "media" && value.every((item: any) => typeof item === "string")) return;
         if (key == "media") {
           value.forEach((item: any) => {
@@ -63,7 +64,7 @@ export default function Page() {
 
         formData.append(key, value as any);
       });
-
+      console.log({ formData });
       return classId ? client.put(`/class/edit/${classId}`, formData) : client.post(`/class/create`, formData);
     },
     onError: (error) => {
