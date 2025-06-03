@@ -63,11 +63,11 @@ export const FormMedia = ({ label }: IProps) => {
                 );
               })}
             </div>
-            {!isMediaAllStrings && (
+            {/* {!isMediaAllStrings && (
               <button type="button" onClick={() => document.getElementById("media")?.click()} className="text-primary absolute left-[50%] translate-x-[-50%] bottom-1 underline">
                 Upload more media
               </button>
-            )}
+            )} */}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center text-[13px] h-[300px]">
