@@ -61,7 +61,7 @@ export const useGetTrainer = (trainerId: string | null) => {
   });
 };
 
-export const useGetGymTrainer = (gymId: string | null) => {
+export const useGetGymTrainer = (gymId: string | null|undefined) => {
   return useQuery({
     queryKey: [`${CacheKeys.Trainers}/gym`, gymId],
     queryFn: async () => {

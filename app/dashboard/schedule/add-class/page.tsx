@@ -5,7 +5,7 @@ import { FormCheckBox, FormDate, FormInput, FormMedia, FormSelect } from "@/comp
 import { FormReactSelect } from "@/components/forms/form-react-select";
 import { SectionHeader } from "@/components/shared/section-header";
 import { Form } from "@/components/ui/form";
-import { useGetClassDetails, useGetTrainers, useGetUser } from "@/hooks/shared";
+import { useGetClassDetails, useGetTrainers, useGetUser, useGetGymTrainer } from "@/hooks/shared";
 import { CacheKeys, cn, showError } from "@/lib";
 import { client } from "@/lib/api";
 import { FormSchemaProvider } from "@/providers";
@@ -22,8 +22,11 @@ export default function Page() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
-  const { data } = useGetTrainers();
+  // const { data } = useGetTrainers();
   const { data: userData } = useGetUser();
+  // const gymId = userData?.data?._id ?? null;
+  const { data } = useGetGymTrainer(userData?.data?._id ?? null);
+
   const form = useForm<TClassSchema>({
     resolver: zodResolver(AddClassSchema),
     mode: "onBlur",
