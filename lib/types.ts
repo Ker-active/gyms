@@ -75,9 +75,9 @@ export interface IClass {
   __v: number;
   totalBooked: string;
   totalSlot: string;
-  totalSlots:string;
+  totalSlots: string;
   gym: string;
-  shareableLink:string;
+  shareableLink: string;
 }
 
 export interface IBookingResponse {
@@ -144,4 +144,16 @@ export interface TBookingAttendedResponse {
     createdAt: string;
     __v: number;
   };
+}
+
+export interface IWeeklyMetric {
+  totalAttendance: number;
+  totalClasses: number;
+  totalPayments: number;
+  weekStarting: string | Date;
+}
+export interface IWeeklyMetricResponse {
+  success: boolean;
+  data: IWeeklyMetric;
+  message: string;
 }

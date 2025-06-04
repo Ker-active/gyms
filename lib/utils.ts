@@ -22,6 +22,7 @@ export enum CacheKeys {
   Services_List = "services list",
   Amenities_List = "amenities list",
   SpecialNeeds_List = "Special Needs list",
+  Dashboard_Metric_Weekly="dashboard metric weekly"
 }
 
 export const convert24to12 = (time24: string) => {

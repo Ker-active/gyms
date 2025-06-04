@@ -1,6 +1,6 @@
 import { CacheKeys } from "@/lib";
 import { client } from "@/lib/api";
-import { IBookingResponse, IClass, IClassResponse, IEvent, IEventResponse, TUser } from "@/lib/types";
+import { IBookingResponse, IClass, IClassResponse, IEvent, IEventResponse, TUser, IWeeklyMetricResponse } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetUser = () => {
@@ -61,7 +61,7 @@ export const useGetTrainer = (trainerId: string | null) => {
   });
 };
 
-export const useGetGymTrainer = (gymId: string | null|undefined) => {
+export const useGetGymTrainer = (gymId: string | null | undefined) => {
   return useQuery({
     queryKey: [`${CacheKeys.Trainers}/gym`, gymId],
     queryFn: async () => {
@@ -87,5 +87,14 @@ export const useGetEventDetails = (eventId: string | null) => {
       return client.get(`/event/view/${eventId}`).then((res) => res.data as Promise<{ data: IEvent }>);
     },
     enabled: !!eventId,
+  });
+};
+
+export const useGetDashboardMetricWeekly = (date: Date = new Date()) => {
+  return useQuery({
+    queryKey: [CacheKeys.Dashboard_Metric_Weekly, date],
+    queryFn: async () => {
+      return client.get(`/gym/summary/weekly?date=${date}`).then((res) => res.data as Promise<IWeeklyMetricResponse>);
+    },
   });
 };

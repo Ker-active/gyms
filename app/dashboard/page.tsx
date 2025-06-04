@@ -1,6 +1,8 @@
 "use client";
+import WeeklyMetrics from "@/components/calender/weekly-metrics-summary";
 import { ClassInfo } from "@/components/classes/class-info";
 import { DateChange, LoadingComponent } from "@/components/shared";
+import DateCalendarNavigation from "@/components/shared/date-calendar-navigation";
 import { Button } from "@/components/ui/button";
 import { useGetClasss } from "@/hooks/shared";
 import { getClassesForDate, getClassesForDateArray, Routes } from "@/lib";
@@ -40,10 +42,11 @@ export default function Root() {
             ) : null}
           </div>
         </article>
-        <article className="bg-white space-y-[21px] g px-[20px] py-[33px]">
+        <WeeklyMetrics />
+        {/* <article className="bg-white space-y-[21px] g px-[20px] py-[33px]">
           <header className="flex flex-row items-center justify-between">
             <h3 className="font-medium text-base">This week</h3>
-            <DateChange />
+            <DateCalendarNavigation />
           </header>
           <ul className="space-y-[13px]">
             {Array.from({ length: 4 }).map((_, index) => (
@@ -53,7 +56,7 @@ export default function Root() {
               </li>
             ))}
           </ul>
-        </article>
+        </article> */}
       </section>
     </section>
   );
