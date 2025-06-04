@@ -77,6 +77,7 @@ export interface IClass {
   totalSlot: string;
   totalSlots:string;
   gym: string;
+  shareableLink:string;
 }
 
 export interface IBookingResponse {

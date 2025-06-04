@@ -27,6 +27,7 @@ interface IClassArray {
     totalBooked: string;
     totalSlot: string;
     availableSlot: string;
+    shareableLink: string;
   }[];
 }
 
@@ -52,6 +53,7 @@ function formatClass(classDetails: IClassResponse["data"]) {
       totalBooked: item.totalBooked,
       totalSlot: item.totalSlot,
       availableSlot: item.availableSlot,
+      shareableLink: item.shareableLink,
     };
 
     const existingDay = acc.find((d) => d.day === day);
@@ -91,7 +93,7 @@ export const Classes = ({ isForTrainer = false, classDetails }: IProps) => {
                 <div className={cn("px-4  min-w-[195px] pb-[11px] pt-4 rounded-[16px]", isForTrainer && "h-[80px]", backgrounds[(index + timeTable.indexOf(day)) % backgrounds.length])} key={index}>
                   <div className="flex mb-2 flex-row items-center justify-between">
                     <p className="font-semibold">{event.name}</p>
-                    <FloatingComponent onlineLink={event.onlineLink} _id={event.classId} isForTrainer={isForTrainer} />
+                    <FloatingComponent onlineLink={event.onlineLink} _id={event.classId} shareableLink={event.shareableLink} isForTrainer={isForTrainer} />
                   </div>
                   <div className="flex mb-1 gap-2 items-center flex-row">
                     <Clock size={16} />
