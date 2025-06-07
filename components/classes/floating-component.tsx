@@ -13,10 +13,11 @@ import { client } from "@/lib/api";
 interface IProps {
   isForTrainer?: boolean;
   onlineLink?: string;
+  shareableLink?: string;
   _id?: string;
 }
 
-export const FloatingComponent = ({ isForTrainer = false, onlineLink = "online link", _id = "giberrish" }: IProps) => {
+export const FloatingComponent = ({ isForTrainer = false, onlineLink = "online link", _id = "giberrish", shareableLink }: IProps) => {
   const [isBookNowModalOpen, setIsBookNowModalOpen] = useState(false);
   const queryClient = useQueryClient();
 
@@ -82,7 +83,7 @@ export const FloatingComponent = ({ isForTrainer = false, onlineLink = "online l
               </MenubarSubTrigger>
               <MenubarSubContent>
                 <MenubarItem className="w-[364px] text-[#1C1939] flex flex-col items-start space-y-2 rounded-[8px]">
-                  <CopyLink link={onlineLink} />
+                  <CopyLink link={shareableLink ?? ''} />
                 </MenubarItem>
               </MenubarSubContent>
             </MenubarSub>
