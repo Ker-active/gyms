@@ -17,7 +17,6 @@ export const Trainers = ({ showAll = false }: IProps) => {
   if (isPending) return <LoadingComponent />;
 
   if (data?.data.length == 0) return <Empty href={Routes["add-trainer"]} linkText="Add Trainer" desc={"Add a trainer to see list of trainers here "} src={"/members.svg"} alt={"Members Icon"} />;
-
   const displayedData = (showAll ? data?.data : data?.data.slice(0, 4)) || [];
   return (
     <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
