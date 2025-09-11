@@ -3,6 +3,7 @@
 import { Dialog, DialogContent, DialogOverlay, DialogPortal, DialogClose } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -309,15 +310,14 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
                   {/* <hr className="border-t" /> */}
 
                   <label className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={dailyWeekdayEnabled}
-                      onChange={(e) => {
-                        const checked = e.target.checked;
+                      onCheckedChange={(val) => {
+                        const checked = Boolean(val);
                         setDailyWeekdayEnabled(checked);
                         if (checked) setDailyEveryEnabled(false);
                       }}
-                      className="h-5 w-5 accent-[#008080] rounded"
+                      className="h-6 w-6 rounded-[8px] border border-[#CFD3D4] data-[state=checked]:bg-[#008080] data-[state=checked]:border-[#008080]"
                     />
                     <span className="font-inter text-[14px] text-[#000000]">Every weekday</span>
                   </label>
