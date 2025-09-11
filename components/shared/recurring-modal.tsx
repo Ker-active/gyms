@@ -1,7 +1,8 @@
 "use client";
 
-import { Dialog, DialogContent, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
+import { Dialog, DialogOverlay, DialogPortal, DialogClose } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { useState, useEffect, useMemo } from "react";
 
 interface IProps {
@@ -212,6 +213,12 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div className="flex justify-center mt-[31px]">
+            <DialogClose asChild>
+              <button className=" bg-[#008080] font-inter text-sm font-normal text-white px-[12px] py-[8px] rounded-[5px]" >Cancel</button>
+            </DialogClose>
           </div>
         </div>
       </DialogPortal>
