@@ -101,6 +101,13 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
     setWeeklyDays((prev) => ({ ...prev, [day]: !prev[day as keyof typeof prev] }));
   };
 
+  // Monthly state
+  const [monthlyInterval, setMonthlyInterval] = useState<number>(1);
+  const [monthlyMode, setMonthlyMode] = useState<"day" | "weekday">("weekday");
+  const [monthlyDay, setMonthlyDay] = useState<number>(1);
+  const [monthlyWeekOrdinal, setMonthlyWeekOrdinal] = useState<string>("First");
+  const [monthlyWeekday, setMonthlyWeekday] = useState<string>("Monday");
+
   // Initialize with form values when modal opens
   useEffect(() => {
     if (isOpen && formTimeFrom && formTimeTo) {
@@ -376,6 +383,51 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
                         <span className="font-inter text-[14px] text-[#262626]">{day}</span>
                       </label>
                     ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Monthly options panel */}
+            {recurrencePattern === "monthly" && (
+              <div className="mt-3 border rounded-md bg-white">
+                <div className="p-4 space-y-4">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <span className="font-inter text-[14px] text-[#262626]">The</span>
+                      <Select value={monthlyWeekOrdinal} onValueChange={setMonthlyWeekOrdinal}>
+                        <SelectTrigger className="w-[130px] bg-white border border-gray-300 rounded-[8px] h-9 px-4">
+                          <SelectValue placeholder="First" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {['First','Second','Third','Fourth','Last'].map((o) => (
+                            <SelectItem key={o} value={o}>{o}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select value={monthlyWeekday} onValueChange={setMonthlyWeekday}>
+                        <SelectTrigger className="w-[120px] bg-white border border-gray-300 rounded-[8px] h-9 px-4">
+                          <SelectValue placeholder="Monday" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map((d) => (
+                            <SelectItem key={d} value={d}>{d}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <span className="font-inter text-[14px] text-[#000000]">Of every</span>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="number"
+                        min={1}
+                        value={monthlyInterval}
+                        onChange={(e) => setMonthlyInterval(Math.max(1, Number(e.target.value)))}
+                        className="w-[39px] h-[24px] rounded-[8px] text-center border focus:outline-none"
+                      />
+                      <span className="font-inter text-[14px] text-[#262626]">Month(s)</span>
+                    </div>
                   </div>
                 </div>
               </div>
