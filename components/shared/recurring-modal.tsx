@@ -1,9 +1,10 @@
 "use client";
 
-import { Dialog, DialogOverlay, DialogPortal, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogOverlay, DialogPortal, DialogClose } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface IProps {
   isOpen: boolean;
@@ -74,6 +75,12 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
   const [startTime, setStartTime] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
   const [duration, setDuration] = useState<string>("");
+  const [durationBase, setDurationBase] = useState<number>(30);
+  const [recurrencePattern, setRecurrencePattern] = useState<"daily" | "weekly" | "monthly" | "">("");
+  const [dailyEveryEnabled, setDailyEveryEnabled] = useState<boolean>(true);
+  const [dailyInterval, setDailyInterval] = useState<number>(1);
+  const [dailyWeekdayEnabled, setDailyWeekdayEnabled] = useState<boolean>(false);
+  const dailyPanelRef = useRef<HTMLDivElement | null>(null);
 
   // Initialize with form values when modal opens
   useEffect(() => {
@@ -128,6 +135,25 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
     }
   }, [startTime, endTime, isDurationManuallyChanged]);
 
+  // When Daily is selected, scroll the daily section into view smoothly
+  useEffect(() => {
+    if (recurrencePattern === "daily") {
+      // Defer slightly to ensure the panel is mounted
+      requestAnimationFrame(() => {
+        dailyPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+      });
+    }
+  }, [recurrencePattern]);
+
+  // Keep the duration options anchored to the current diff unless user manually changed duration
+  useEffect(() => {
+    if (!isDurationManuallyChanged) {
+      const diff = startTime && endTime ? calculateDuration(startTime, endTime) : 0;
+      const base = diff > 0 ? diff : 30;
+      setDurationBase(base);
+    }
+  }, [startTime, endTime, isDurationManuallyChanged]);
+
   // Handle duration change - update end time
   const handleDurationChange = (newDuration: string) => {
     setIsDurationManuallyChanged(true); // Mark as manually changed
@@ -139,12 +165,10 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
     }
   };
 
-  // Generate duration options based on current difference, adding +30 mins subsequently (4 options)
+  // Generate duration options anchored to durationBase (stable after manual change)
   const durationOptions = useMemo(() => {
-    const diff = startTime && endTime ? calculateDuration(startTime, endTime) : 0;
-    const base = diff > 0 ? diff : 30; // fallback to 30 if invalid
-    return [base, base + 30, base + 60, base + 90];
-  }, [startTime, endTime]);
+    return [durationBase, durationBase + 30, durationBase + 60, durationBase + 90];
+  }, [durationBase]);
 
   // When user changes start or end time manually, allow auto duration recalc again
   const handleStartChange = (value: string) => {
@@ -158,11 +182,10 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogPortal>
-        <DialogOverlay />
-        <div className="fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%] w-[350px] p-4 bg-[#F3F3F3] shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg">
-          <div className="space-y-[17px]">
-            <h3 className="text-[#008080] font-inter font-bold text-[14px] leading-[18px] pb-[17px]">
+        <DialogContent hideCloseButton className="max-w-[450px] bg-[#F3F3F3] p-4">
+            <ScrollArea className="max-h-[85vh]" scrollBarThumbClassName="bg-transparent">
+          <div className="space-y-[15px]">
+            <h3 className="text-[#008080] font-inter font-bold text-[14px] leading-[18px]">
               Class time
             </h3>
 
@@ -214,14 +237,101 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
               </Select>
             </div>
           </div>
+           <div className="space-y-[7px] mt-[31px]">
+              <h4 className="text-[#008080] font-inter font-bold text-[14px] leading-[18px]">Recurrence pattern</h4>
+              <div className="border rounded-md bg-white overflow-hidden">
+                <div className="px-4 py-3 font-inter font-bold text-[16px] text-[#262626]">Select</div>
+                <div className="grid grid-cols-3 border-t">
+                  <label className="flex items-center justify-center gap-3 py-5 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="recurrence"
+                      value="daily"
+                      checked={recurrencePattern === "daily"}
+                      onChange={() => setRecurrencePattern("daily")}
+                      className="h-4 w-4 accent-[#008080]"
+                    />
+                    <span className="font-inter text-[14px] text-[#262626]">Daily</span>
+                  </label>
+                  <label className="flex items-center justify-center gap-3 py-5 cursor-pointer border-l">
+                    <input
+                      type="radio"
+                      name="recurrence"
+                      value="weekly"
+                      checked={recurrencePattern === "weekly"}
+                      onChange={() => setRecurrencePattern("weekly")}
+                      className="h-4 w-4 accent-[#008080]"
+                    />
+                    <span className="font-inter text-[14px] text-[#262626]">Weekly</span>
+                  </label>
+                  <label className="flex items-center justify-center gap-3 py-5 cursor-pointer border-l">
+                    <input
+                      type="radio"
+                      name="recurrence"
+                      value="monthly"
+                      checked={recurrencePattern === "monthly"}
+                      onChange={() => setRecurrencePattern("monthly")}
+                      className="h-4 w-4 accent-[#008080]"
+                    />
+                    <span className="font-inter text-[14px] text-[#262626]">Monthly</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* Daily options panel - render only when selected to avoid layout gap */}
+            {recurrencePattern === "daily" && (
+              <div ref={dailyPanelRef} className="mt-3 border rounded-md bg-white">
+                <div className="p-4 space-y-4">
+                  {/* <label className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      checked={dailyEveryEnabled}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setDailyEveryEnabled(checked);
+                        if (checked) setDailyWeekdayEnabled(false);
+                      }}
+                      className="h-5 w-5 accent-[#008080] rounded"
+                    /> */}
+                    {/* <span className="font-inter text-[16px] text-[#262626]">Every</span>
+                    <input
+                      type="number"
+                      min={1}
+                      value={dailyInterval}
+                      onChange={(e) => setDailyInterval(Math.max(1, Number(e.target.value)))}
+                      disabled={!dailyEveryEnabled}
+                      className="w-[48px] h-[32px] text-center border rounded-md focus:outline-none"
+                    />
+                    <span className="font-inter text-[16px] text-[#262626]">Day(s)</span>
+                  </label> */}
+
+                  {/* <hr className="border-t" /> */}
+
+                  <label className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      checked={dailyWeekdayEnabled}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setDailyWeekdayEnabled(checked);
+                        if (checked) setDailyEveryEnabled(false);
+                      }}
+                      className="h-5 w-5 accent-[#008080] rounded"
+                    />
+                    <span className="font-inter text-[14px] text-[#000000]">Every weekday</span>
+                  </label>
+                </div>
+              </div>
+            )}
 
           <div className="flex justify-center mt-[31px]">
             <DialogClose asChild>
               <button className=" bg-[#008080] font-inter text-sm font-normal text-white px-[12px] py-[8px] rounded-[5px]" >Cancel</button>
             </DialogClose>
           </div>
-        </div>
-      </DialogPortal>
+          </ScrollArea>
+        </DialogContent>
     </Dialog>
   );
 };
