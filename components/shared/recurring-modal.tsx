@@ -82,6 +82,8 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
   const [dailyInterval, setDailyInterval] = useState<number>(1);
   const [dailyWeekdayEnabled, setDailyWeekdayEnabled] = useState<boolean>(false);
   const dailyPanelRef = useRef<HTMLDivElement | null>(null);
+  const [rangeStart, setRangeStart] = useState<string>("");
+  const [rangeEnd, setRangeEnd] = useState<string>("");
 
   // Initialize with form values when modal opens
   useEffect(() => {
@@ -325,10 +327,81 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
               </div>
             )}
 
-          <div className="flex justify-center mt-[31px]">
+            {/* Weekly options panel */}
+            {recurrencePattern === "weekly" && (
+              <div className="mt-3 border rounded-md bg-white">
+                <div className="p-4 space-y-4">
+                  <label className="flex items-center gap-3">
+                    <Checkbox
+                      checked={true}
+                      className="h-6 w-6 rounded-[8px] border border-[#CFD3D4] data-[state=checked]:bg-[#008080] data-[state=checked]:border-[#008080]"
+                    />
+                    <span className="font-inter text-[14px] text-[#262626]">Every</span>
+                    <input
+                      type="number"
+                      min={1}
+                      defaultValue={1}
+                      className="w-[39px] h-[24px]  rounded-[8px] text-center border focus:outline-none"
+                    />
+                    <span className="font-inter text-[14px] text-[#262626]">Week(s) on</span>
+                  </label>
+
+                  <hr className="border-t" />
+
+                  <div className="grid grid-cols-3 gap-y-6 gap-x-0">
+                    {[
+                      "Monday",
+                      "Tuesday",
+                      "Wednesday",
+                      "Thursday",
+                      "Friday",
+                      "Saturday",
+                      "Sunday",
+                    ].map((day) => (
+                      <label key={day} className="flex items-center gap-3">
+                        <Checkbox className="h-6 w-6 rounded-[8px] border border-[#CFD3D4] data-[state=checked]:bg-[#008080] data-[state=checked]:border-[#008080]" />
+                        <span className="font-inter text-[14px] text-[#262626]">{day}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <h4 className="text-[#008080] font-inter font-bold text-[14px] leading-[18px] mt-[31px]">Range of recurrence</h4>
+              <div className="grid grid-cols-2 gap-6 items-start">
+                <div className="space-y-[15px]">
+                  <label className="text-[#000000] font-inter text-[14px] leading-4">Start by</label>
+                  <input
+                    type="date"
+                    value={rangeStart}
+                    onChange={(e) => setRangeStart(e.target.value)}
+                    className="h-[45px] w-full rounded-[5px] border border-[#E5E7EB] bg-white px-4 text-[14px] text-[#262626] focus:outline-none"
+                  />
+                </div>
+                <div className="space-y-[15px]">
+                  <label className="text-[#000000] font-inter text-[14px] leading-4">End by</label>
+                  <input
+                    type="date"
+                    value={rangeEnd}
+                    onChange={(e) => setRangeEnd(e.target.value)}
+                    className="h-[45px] w-full rounded-[5px] border border-[#E5E7EB] bg-white px-4 text-[14px] text-[#262626] focus:outline-none"
+                  />
+                </div>
+              </div>
+            
+            </div>
+
+          <div className="flex justify-center mt-[31px] gap-[10px]">
+            <button className=" bg-[#008080] font-inter text-sm font-normal text-white px-[12px] py-[8px] rounded-[5px]">Add Recurring</button>
+
             <DialogClose asChild>
               <button className=" bg-[#008080] font-inter text-sm font-normal text-white px-[12px] py-[8px] rounded-[5px]" >Cancel</button>
             </DialogClose>
+
+            <button className="bg-[#CBCBCB] text-[#FFFFFF] font-inter text-[14px] rounded-[6px] px-5 py-2">Remove Recurring
+            </button>
           </div>
           </ScrollArea>
         </DialogContent>
