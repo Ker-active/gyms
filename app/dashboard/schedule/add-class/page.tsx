@@ -2,9 +2,11 @@
 "use client";
 
 import { FormCheckBox, FormDate, FormInput, FormMedia, FormSelect } from "@/components/forms";
+import { RecurringModal } from "@/components/shared";
 import { FormReactSelect } from "@/components/forms/form-react-select";
 import { SectionHeader } from "@/components/shared/section-header";
 import { Form } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
 import { useGetClassDetails, useGetTrainers, useGetUser, useGetGymTrainer } from "@/hooks/shared";
 import { CacheKeys, cn, showError } from "@/lib";
 import { client } from "@/lib/api";
@@ -14,7 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "nextjs-toploader/app";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -22,6 +24,7 @@ export default function Page() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
+  const [isRecurringModalOpen, setIsRecurringModalOpen] = useState(false);
   // const { data } = useGetTrainers();
   const { data: userData } = useGetUser();
   // const gymId = userData?.data?._id ?? null;
@@ -128,10 +131,61 @@ export default function Page() {
               <FormInput<TClassSchema> containerClassName="w-full" placeholder="Enter" label="Room" name="room" />
               <FormDate<TClassSchema> containerClassName="w-full" name="date" />
 
-              <div className={cn("flex flex-row gap-4 items-start")}>
-                <FormInput<TClassSchema> name="timeFrom" label="Time From (WAT)" type="time" />
+              <div className={cn("flex flex-row gap-2 items-end flex-wrap sm:flex-nowrap")}> 
+                <FormInput<TClassSchema> name="timeFrom" label="Time" type="time" className="w-[100px] sm:w-[120px] px-3" />
                 <p className={cn("mt-auto", form.formState.errors?.timeFrom || form.formState.errors.timeTo ? "mb-9" : "mb-3")}>to</p>
-                <FormInput<TClassSchema> name="timeTo" type="time" label="Time To (WAT)" />
+                <FormInput<TClassSchema>
+                  name="timeTo"
+                  type="time"
+                  className="w-[100px] sm:w-[120px] px-3"
+                  label="Time"
+                  labelClassName="invisible"
+                />
+                  
+                <Button
+                  type="button"
+                  variant="default"
+                  size="sm"
+                  disabled={
+                    // Check only the essential fields for recurring setup (excluding trainer)
+                    !form.watch("title") || 
+                    !form.watch("type") || 
+                    !form.watch("availableSlot") || 
+                    !form.watch("date") || 
+                    !form.watch("timeFrom") || 
+                    !form.watch("timeTo") || 
+                    !form.watch("description") ||
+                    !!form.formState.errors.title ||
+                    !!form.formState.errors.type ||
+                    !!form.formState.errors.availableSlot ||
+                    !!form.formState.errors.date ||
+                    !!form.formState.errors.timeFrom ||
+                    !!form.formState.errors.timeTo ||
+                    !!form.formState.errors.description
+                  }
+                  className="self-end h-[40px] leading-none text-white font-normal whitespace-nowrap px-4 text-sm bg-[#008080] hover:bg-[#006666] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  onClick={async () => {
+                    
+                    // Validate specific fields excluding trainer for recurring setup
+                    const fieldsToValidate = ['title', 'type', 'availableSlot', 'date', 'timeFrom', 'timeTo', 'description'];
+                    const isValid = await form.trigger(fieldsToValidate);
+                    
+                    if (!isValid) {
+                      toast.error("Please fill in all required fields and fix any errors before setting up recurring options");
+                      return;
+                    }
+                    
+                    if (form.getValues("media").length === 0) {
+                      toast.error("Please upload at least one picture before setting up recurring options");
+                      return;
+                    }
+                    
+                    // All validations passed - open recurring modal
+                    setIsRecurringModalOpen(true);
+                  }}
+                >
+                  Make Recurring
+                </Button>
               </div>
 
               <div className="flex flex-row gap-6 items-center w-full justify-between">
@@ -158,6 +212,12 @@ export default function Page() {
           </form>
         </FormSchemaProvider>
       </Form>
+      <RecurringModal 
+        isOpen={isRecurringModalOpen} 
+        setIsOpen={setIsRecurringModalOpen}
+        formTimeFrom={form.watch("timeFrom")}
+        formTimeTo={form.watch("timeTo")}
+      />
     </section>
   );
 }
