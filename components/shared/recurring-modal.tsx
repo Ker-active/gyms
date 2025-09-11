@@ -85,6 +85,22 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
   const [rangeStart, setRangeStart] = useState<string>("");
   const [rangeEnd, setRangeEnd] = useState<string>("");
 
+  // Weekly state
+  const [weeklyInterval, setWeeklyInterval] = useState<number>(1);
+  const [weeklyDays, setWeeklyDays] = useState<Record<string, boolean>>({
+    Monday: true,
+    Tuesday: false,
+    Wednesday: true,
+    Thursday: false,
+    Friday: true,
+    Saturday: false,
+    Sunday: false,
+  });
+
+  const toggleWeeklyDay = (day: string) => {
+    setWeeklyDays((prev) => ({ ...prev, [day]: !prev[day as keyof typeof prev] }));
+  };
+
   // Initialize with form values when modal opens
   useEffect(() => {
     if (isOpen && formTimeFrom && formTimeTo) {
@@ -319,7 +335,7 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
                         setDailyWeekdayEnabled(checked);
                         if (checked) setDailyEveryEnabled(false);
                       }}
-                      className="h-6 w-6 rounded-[8px] border border-[#CFD3D4] data-[state=checked]:bg-[#008080] data-[state=checked]:border-[#008080]"
+                      className="h-6 w-6 rounded-[8px] border border-[#CFD3D4] data-[state=checked]:bg-[#008080] data-[state=checked]:border-[#008080] data-[state=checked]:ring-1 data-[state=checked]:ring-[#008080] data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-white data-[state=checked]:text-[#B0CAD9]"
                     />
                     <span className="font-inter text-[14px] text-[#000000]">Every weekday</span>
                   </label>
@@ -334,13 +350,14 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
                   <label className="flex items-center gap-3">
                     <Checkbox
                       checked={true}
-                      className="h-6 w-6 rounded-[8px] border border-[#CFD3D4] data-[state=checked]:bg-[#008080] data-[state=checked]:border-[#008080]"
+                      className="h-6 w-6 rounded-[8px] border border-[#CFD3D4] data-[state=checked]:bg-[#008080] data-[state=checked]:border-[#008080] data-[state=checked]:ring-1 data-[state=checked]:ring-[#008080] data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-white data-[state=checked]:text-[#B0CAD9]"
                     />
                     <span className="font-inter text-[14px] text-[#262626]">Every</span>
                     <input
                       type="number"
                       min={1}
-                      defaultValue={1}
+                      value={weeklyInterval}
+                      onChange={(e) => setWeeklyInterval(Math.max(1, Number(e.target.value)))}
                       className="w-[39px] h-[24px]  rounded-[8px] text-center border focus:outline-none"
                     />
                     <span className="font-inter text-[14px] text-[#262626]">Week(s) on</span>
@@ -349,17 +366,13 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
                   <hr className="border-t" />
 
                   <div className="grid grid-cols-3 gap-y-6 gap-x-0">
-                    {[
-                      "Monday",
-                      "Tuesday",
-                      "Wednesday",
-                      "Thursday",
-                      "Friday",
-                      "Saturday",
-                      "Sunday",
-                    ].map((day) => (
+                    {Object.keys(weeklyDays).map((day) => (
                       <label key={day} className="flex items-center gap-3">
-                        <Checkbox className="h-6 w-6 rounded-[8px] border border-[#CFD3D4] data-[state=checked]:bg-[#008080] data-[state=checked]:border-[#008080]" />
+                        <Checkbox
+                          checked={weeklyDays[day]}
+                          onCheckedChange={() => toggleWeeklyDay(day)}
+                          className="h-6 w-6 rounded-[8px] border border-[#CFD3D4] data-[state=checked]:bg-[#008080] data-[state=checked]:border-[#008080] data-[state=checked]:ring-1 data-[state=checked]:ring-[#008080] data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-white data-[state=checked]:text-[#B0CAD9]"
+                        />
                         <span className="font-inter text-[14px] text-[#262626]">{day}</span>
                       </label>
                     ))}
