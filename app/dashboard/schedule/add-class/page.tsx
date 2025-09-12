@@ -2,7 +2,7 @@
 "use client";
 
 import { FormCheckBox, FormDate, FormInput, FormMedia, FormSelect } from "@/components/forms";
-import { RecurringModal } from "@/components/shared";
+import { RecurringModal, RecurringData } from "@/components/shared";
 import { FormReactSelect } from "@/components/forms/form-react-select";
 import { SectionHeader } from "@/components/shared/section-header";
 import { Form } from "@/components/ui/form";
@@ -25,10 +25,19 @@ export default function Page() {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const [isRecurringModalOpen, setIsRecurringModalOpen] = useState(false);
-  // const { data } = useGetTrainers();
+  const [recurringData, setRecurringData] = useState<RecurringData | null>(null);
+  // Try both trainer fetching methods for testing
+  const { data: trainerData } = useGetTrainers();
   const { data: userData } = useGetUser();
   // const gymId = userData?.data?._id ?? null;
-  const { data } = useGetGymTrainer(userData?.data?._id ?? null);
+  const { data: gymTrainerData } = useGetGymTrainer(userData?.data?._id ?? null);
+  
+  // Monitor data loading
+  useEffect(() => {
+    if (!userData?.data && !trainerData?.data && !gymTrainerData?.data) {
+      console.log("Waiting for trainer data to load...");
+    }
+  }, [userData, trainerData, gymTrainerData]);
 
   const form = useForm<TClassSchema>({
     resolver: zodResolver(AddClassSchema),
@@ -42,22 +51,35 @@ export default function Page() {
   const { data: classDetails } = useGetClassDetails(classId);
 
   const trainersOptions = useMemo(() => {
-    if (!data?.data) return [];
-    return data.data.map((trainer) => ({
+    // Try to get trainers from either source
+    const trainers = gymTrainerData?.data || trainerData?.data || [];
+    
+    return trainers.map((trainer) => ({
       value: trainer._id,
       label: trainer.fullname,
     }));
-  }, [data?.data]);
+  }, [gymTrainerData?.data, trainerData?.data]);
 
   function onSubmit(values: TClassSchema) {
+    // Validate availableSlot is a number
+    if (isNaN(Number(values.availableSlot))) {
+      return toast.error("Available slot must be a number");
+    }
+    
+    // Convert availableSlot to a number to ensure it's sent correctly
+    form.setValue("availableSlot", Number(values.availableSlot).toString());
+    
     if (form.getValues("media").length == 0) return toast.error("Picture is required");
-    mutate(values);
+    mutate({ ...values, recurringData });
   }
 
   const { mutate, isPending } = useMutation({
-    mutationFn: (data: TClassSchema) => {
+    mutationFn: (data: TClassSchema & { recurringData: RecurringData | null }) => {
       const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
+      const { recurringData, ...classData } = data;
+      
+      // Add regular class data
+      Object.entries(classData).forEach(([key, value]) => {
         if (value === undefined) return;
         if (key == "media" && value.every((item: any) => typeof item === "string")) return;
         if (key == "media") {
@@ -70,7 +92,36 @@ export default function Page() {
 
         formData.append(key, value as any);
       });
-      console.log({ formData });
+      
+      // Handle recurring data
+      if (recurringData) {
+        formData.append("isRecurring", "true");
+        formData.append("recurrencePattern", recurringData.recurrencePattern);
+        formData.append("interval", recurringData.interval.toString());
+        formData.append("rangeStart", recurringData.rangeStart);
+        formData.append("rangeEnd", recurringData.rangeEnd);
+        
+        // Add weekDays if present
+        if (recurringData.weekDays && recurringData.weekDays.length > 0) {
+          recurringData.weekDays.forEach((day, index) => {
+            formData.append(`weekDays[${index}]`, day);
+          });
+        }
+        
+        // Add monthly specific fields if present
+        if (recurringData.recurrencePattern === "MONTHLY") {
+          if (recurringData.monthlyWeekOrdinal) {
+            formData.append("monthlyRule[week]", recurringData.monthlyWeekOrdinal);
+          }
+          if (recurringData.monthlyWeekday) {
+            formData.append("monthlyRule[day]", recurringData.monthlyWeekday.toLowerCase());
+          }
+        }
+      } else {
+        // Explicitly set isRecurring to false for non-recurring classes
+        formData.append("isRecurring", "false");
+      }
+      // Form data ready for submission
       return classId ? client.put(`/class/edit/${classId}`, formData) : client.post(`/class/create`, formData);
     },
     onError: (error) => {
@@ -167,8 +218,7 @@ export default function Page() {
                   onClick={async () => {
                     
                     // Validate specific fields excluding trainer for recurring setup
-                    const fieldsToValidate = ['title', 'type', 'availableSlot', 'date', 'timeFrom', 'timeTo', 'description'];
-                    const isValid = await form.trigger(fieldsToValidate);
+                    const isValid = await form.trigger(['title', 'type', 'availableSlot', 'date', 'timeFrom', 'timeTo', 'description']);
                     
                     if (!isValid) {
                       toast.error("Please fill in all required fields and fix any errors before setting up recurring options");
@@ -217,6 +267,10 @@ export default function Page() {
         setIsOpen={setIsRecurringModalOpen}
         formTimeFrom={form.watch("timeFrom")}
         formTimeTo={form.watch("timeTo")}
+        onSubmitRecurring={(data) => {
+          setRecurringData(data);
+          toast.success("Recurring pattern added");
+        }}
       />
     </section>
   );

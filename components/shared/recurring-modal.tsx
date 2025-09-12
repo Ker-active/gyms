@@ -12,6 +12,19 @@ interface IProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   formTimeFrom?: string;
   formTimeTo?: string;
+  onSubmitRecurring?: (recurringData: RecurringData) => void;
+}
+
+export interface RecurringData {
+  isRecurring: boolean;
+  recurrencePattern: "DAILY" | "WEEKLY" | "MONTHLY";
+  interval: number;
+  weekDays?: string[];
+  rangeStart: string;
+  rangeEnd: string;
+  // Monthly specific
+  monthlyWeekOrdinal?: string;
+  monthlyWeekday?: string;
 }
 
 // Generate 4 time options in 15-minute intervals from a base time
@@ -72,7 +85,7 @@ const formatDuration = (minutes: number): string => {
   return `${hours}h ${remainingMinutes}m`;
 };
 
-export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: IProps) => {
+export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, onSubmitRecurring }: IProps) => {
   const [startTime, setStartTime] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
   const [duration, setDuration] = useState<string>("");
@@ -84,6 +97,58 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
   const dailyPanelRef = useRef<HTMLDivElement | null>(null);
   const [rangeStart, setRangeStart] = useState<string>("");
   const [rangeEnd, setRangeEnd] = useState<string>("");
+
+  // Handle form submission for recurring pattern
+  const handleSubmitRecurring = () => {
+    if (!onSubmitRecurring) return;
+    
+    // Build recurring data based on selected pattern
+    const recurringData: RecurringData = {
+      isRecurring: true,
+      recurrencePattern: "DAILY", // Default, will be overridden if needed
+      interval: 1, // Default
+      rangeStart,
+      rangeEnd
+    };
+    
+    // Pattern-specific data
+    if (recurrencePattern === "daily") {
+      recurringData.recurrencePattern = "DAILY";
+      
+      if (dailyWeekdayEnabled) {
+        // Every weekday (Mon-Fri)
+        recurringData.interval = 1;
+        recurringData.weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+      } else {
+        // Every N days
+        recurringData.interval = dailyInterval;
+        // Do not include weekDays for regular daily recurrence
+        // Explicitly set to empty array to ensure we don't send weekDays
+        recurringData.weekDays = [];
+      }
+    } else if (recurrencePattern === "weekly") {
+      recurringData.recurrencePattern = "WEEKLY";
+      recurringData.interval = weeklyInterval;
+      
+      // Add selected days
+      const selectedDays = Object.entries(weeklyDays)
+        .filter(([_, selected]) => selected)
+        .map(([day]) => day);
+        
+      if (selectedDays.length > 0) {
+        recurringData.weekDays = selectedDays;
+      }
+    } else if (recurrencePattern === "monthly") {
+      recurringData.recurrencePattern = "MONTHLY";
+      recurringData.interval = monthlyInterval;
+      recurringData.monthlyWeekOrdinal = monthlyWeekOrdinal;
+      recurringData.monthlyWeekday = monthlyWeekday;
+    }
+    
+    // Submit data
+    onSubmitRecurring(recurringData);
+    setIsOpen(false); // Close modal after submission
+  };
 
   // Weekly state
   const [weeklyInterval, setWeeklyInterval] = useState<number>(1);
@@ -186,7 +251,7 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
     setDuration(newDuration);
     if (startTime && newDuration) {
       const newEndTime = addMinutesToTime(startTime, parseInt(newDuration));
-      console.log('Duration changed:', { startTime, newDuration, newEndTime }); // Debug log
+      // Update end time based on new duration
       setEndTime(newEndTime);
     }
   };
@@ -307,7 +372,7 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
 
             {/* Daily options panel - render only when selected to avoid layout gap */}
             {recurrencePattern === "daily" && (
-              <div ref={dailyPanelRef} className="mt-3 border rounded-md bg-white">
+              <div ref={dailyPanelRef} className="mt-3 border rounded-md bg-white duration-300 ease-out animate-in fade-in-0 slide-in-from-top-2">
                 <div className="p-4 space-y-4">
                   {/* <label className="flex items-center gap-3">
                     <input
@@ -352,7 +417,7 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
 
             {/* Weekly options panel */}
             {recurrencePattern === "weekly" && (
-              <div className="mt-3 border rounded-md bg-white">
+              <div className="mt-3 border rounded-md bg-white duration-300 ease-out animate-in fade-in-0 slide-in-from-top-2">
                 <div className="p-4 space-y-4">
                   <label className="flex items-center gap-3">
                     <Checkbox
@@ -390,7 +455,7 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
 
             {/* Monthly options panel */}
             {recurrencePattern === "monthly" && (
-              <div className="mt-3 border rounded-md bg-white">
+              <div className="mt-3 border rounded-md bg-white duration-300 ease-out animate-in fade-in-0 slide-in-from-top-2">
                 <div className="p-4 space-y-4">
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
@@ -458,8 +523,15 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo }: 
             
             </div>
 
+          {/* Action buttons */}
           <div className="flex justify-center mt-[31px] gap-[10px]">
-            <button className=" bg-[#008080] font-inter text-sm font-normal text-white px-[12px] py-[8px] rounded-[5px]">Add Recurring</button>
+            <button 
+              className="bg-[#008080] font-inter text-sm font-normal text-white px-[12px] py-[8px] rounded-[5px]"
+              onClick={handleSubmitRecurring}
+              disabled={!rangeStart || !rangeEnd || !recurrencePattern}
+            >
+              Add Recurring
+            </button>
 
             <DialogClose asChild>
               <button className=" bg-[#008080] font-inter text-sm font-normal text-white px-[12px] py-[8px] rounded-[5px]" >Cancel</button>
