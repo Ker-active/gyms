@@ -17,3 +17,4 @@ export * from "./section-header";
 export * from "./loading";
 export * from "./component-loading";
 export * from "./avatar-name";
+export * from "./recurring-modal";
