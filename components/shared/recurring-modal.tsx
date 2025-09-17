@@ -12,6 +12,7 @@ interface IProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   formTimeFrom?: string;
   formTimeTo?: string;
+  initialData?: RecurringData | null;
   onSubmitRecurring?: (recurringData: RecurringData) => void;
 }
 
@@ -85,7 +86,7 @@ const formatDuration = (minutes: number): string => {
   return `${hours}h ${remainingMinutes}m`;
 };
 
-export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, onSubmitRecurring }: IProps) => {
+export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, initialData, onSubmitRecurring }: IProps) => {
   const [startTime, setStartTime] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
   const [duration, setDuration] = useState<string>("");
@@ -226,10 +227,63 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, on
     }
   }, [startTime, endTime, isDurationManuallyChanged]);
 
-  // When Daily is selected, scroll the daily section into view smoothly
+  useEffect(() => {
+    if (initialData && isOpen) {
+      const currentWeeklyDays = { ...weeklyDays };
+      if (initialData.recurrencePattern === "DAILY") {
+        setRecurrencePattern("daily");
+        
+        if (initialData.weekDays && initialData.weekDays.length === 5 && 
+            initialData.weekDays.includes("Monday") && 
+            initialData.weekDays.includes("Tuesday") && 
+            initialData.weekDays.includes("Wednesday") && 
+            initialData.weekDays.includes("Thursday") && 
+            initialData.weekDays.includes("Friday")) {
+          setDailyWeekdayEnabled(true);
+          setDailyEveryEnabled(false);
+        } else {
+          setDailyWeekdayEnabled(false);
+          setDailyEveryEnabled(true);
+          setDailyInterval(initialData.interval);
+        }
+      } else if (initialData.recurrencePattern === "WEEKLY") {
+        setRecurrencePattern("weekly");
+        setWeeklyInterval(initialData.interval);
+        
+        if (initialData.weekDays && initialData.weekDays.length > 0) {
+          const newWeeklyDays = { ...currentWeeklyDays };
+          initialData.weekDays.forEach(day => {
+            newWeeklyDays[day] = true;
+          });
+          setWeeklyDays(newWeeklyDays);
+        }
+      } else if (initialData.recurrencePattern === "MONTHLY") {
+        setRecurrencePattern("monthly");
+        setMonthlyInterval(initialData.interval);
+        
+        if (initialData.monthlyWeekOrdinal && initialData.monthlyWeekday) {
+          setMonthlyMode("weekday");
+          setMonthlyWeekOrdinal(initialData.monthlyWeekOrdinal);
+          setMonthlyWeekday(initialData.monthlyWeekday);
+        } else {
+          setMonthlyMode("day");
+          
+          try {
+            const startDate = new Date(initialData.rangeStart);
+            setMonthlyDay(startDate.getDate());
+          } catch (e) {
+            setMonthlyDay(1); // Default to 1st day
+          }
+        }
+      }
+      
+      setRangeStart(initialData.rangeStart);
+      setRangeEnd(initialData.rangeEnd);
+    }
+  }, [initialData, isOpen, weeklyDays]);
+
   useEffect(() => {
     if (recurrencePattern === "daily") {
-      // Defer slightly to ensure the panel is mounted
       requestAnimationFrame(() => {
         dailyPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
       });
