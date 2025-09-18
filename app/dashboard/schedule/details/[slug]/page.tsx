@@ -95,9 +95,9 @@ export default function Page({ params }: { params: { slug: string } }) {
           </div>
           <div className="flex flex-row items-center justify-between">
             <h3 className="text-[#008080]  font-semibold font-inter">
-              {format(new Date(data.data.date), "EEEE, MMMM d")}, {data.data.timeFrom} - {data.data.timeTo}
+              {data?.data?.date ? format(new Date(data.data.date as string | number | Date), "EEEE, MMMM d") : "Date TBA"}, {data?.data?.timeFrom ?? "--:--"} - {data?.data?.timeTo ?? "--:--"}
             </h3>
-            <p className="text-sm flex flex-row items-center gap-1 text-[#737373]">{data.data.totalSlots} slots available</p>
+            <p className="text-sm flex flex-row items-center gap-1 text-[#737373]">{data?.data?.totalSlots ?? 0} slots available</p>
           </div>
         </header>
         <hr className="mt-2" />
