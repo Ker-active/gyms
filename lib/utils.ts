@@ -165,11 +165,12 @@ interface DayGroup {
 export const getClassesForDate = (data: IClassResponse["data"], targetDate: Date) => {
   if (!data) return [];
 
-  const filteredData = data.filter((item) => isSameDay(parseISO(item.date), targetDate));
+  const filteredData = data.filter((item) => item.date && isSameDay(parseISO(item.date), targetDate));
 
   // Group filtered data by day of the week
   const groupedData = filteredData.reduce<DayGroup[]>((acc, item) => {
-    const day = format(parseISO(item.date), "EEEE");
+    // Add null check for item.date
+    const day = item.date ? format(parseISO(item.date), "EEEE") : "Unknown";
 
     const classDetails = {
       name: item.title,
@@ -206,7 +207,7 @@ export const getClassesForDate = (data: IClassResponse["data"], targetDate: Date
 export const getClassesForDateArray = (data: IClassResponse["data"], targetDate: Date): ClassDetails[] => {
   if (!data) return [];
   return data
-    .filter((item) => isSameDay(parseISO(item.date), targetDate))
+    .filter((item) => item.date && isSameDay(parseISO(item.date), targetDate))
     .map((item) => ({
       name: item.title,
       onLinkLink: item.onlineLink,
