@@ -43,7 +43,7 @@ const convert24to12 = (time24: string) => {
 function formatClass(classDetails: IClassResponse["data"]) {
   if (!classDetails) return [];
   return classDetails.reduce((acc, item) => {
-    const day = format(new Date(item.date), "EEEE");
+    const day = item.date ? format(new Date(item.date), "EEEE") : "Unknown";
     const classDetails = {
       name: item.title,
       trainer: item.trainer?.fullname,
