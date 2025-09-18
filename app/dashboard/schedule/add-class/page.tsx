@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useGetClassDetails, useGetTrainers, useGetUser, useGetGymTrainer } from "@/hooks/shared";
 import { CacheKeys, cn, showError } from "@/lib";
 import { client } from "@/lib/api";
+import { IClass } from "@/lib/types";
 import { FormSchemaProvider } from "@/providers";
 import { AddClassSchema, TClassSchema } from "@/schemas/dashboard";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -54,10 +55,12 @@ export default function Page() {
     // Try to get trainers from either source
     const trainers = gymTrainerData?.data || trainerData?.data || [];
     
-    return trainers.map((trainer) => ({
+    const options = trainers.map((trainer) => ({
       value: trainer._id,
       label: trainer.fullname,
     }));
+    
+    return options;
   }, [gymTrainerData?.data, trainerData?.data]);
 
   function onSubmit(values: TClassSchema) {
@@ -138,13 +141,63 @@ export default function Page() {
 
   useEffect(() => {
     if (classDetails) {
+      // Use type assertion to access recurring properties
+      const classData = classDetails.data as IClass & {
+        isRecurring: boolean;
+        recurrencePattern: "DAILY" | "WEEKLY" | "MONTHLY";
+        interval: number;
+        weekDays: string[];
+        rangeStart: string;
+        rangeEnd: string;
+        monthlyRule?: {
+          week: string;
+          day: string;
+        };
+      };
+      
+      // Format date properly for the form
+      let formattedDate = classData.date;
+      if (classData.date === null && classData.isRecurring) {
+        // For recurring classes with null date, use rangeStart as a fallback
+        const startDate = new Date(classData.rangeStart);
+        formattedDate = startDate.toISOString().split('T')[0];
+      } else if (classData.date) {
+        // Ensure date is in the correct format YYYY-MM-DD
+        formattedDate = new Date(classData.date).toISOString().split('T')[0];
+      }
+      
       form.reset({
-        ...classDetails.data,
-        availableSlot: classDetails.data.availableSlot.toString(),
-        price: classDetails.data?.price?.toString() || "",
-        room: classDetails.data?.room?.toString() || "",
-        trainer: classDetails.data.trainer._id,
+        ...classData,
+        date: formattedDate || '',
+        availableSlot: classData.availableSlot.toString(),
+        price: classData?.price?.toString() || "",
+        room: classData?.room?.toString() || "",
+        trainer: classData.trainer._id,
       });
+      
+      // Check if class is recurring and set the recurring data
+      if (classData.isRecurring) {
+        const initialRecurringData: RecurringData = {
+          isRecurring: true,
+          recurrencePattern: classData.recurrencePattern,
+          interval: classData.interval,
+          rangeStart: new Date(classData.rangeStart).toISOString().split('T')[0],
+          rangeEnd: new Date(classData.rangeEnd).toISOString().split('T')[0],
+        };
+        
+        // Add weekDays if present
+        if (classData.weekDays && classData.weekDays.length > 0) {
+          initialRecurringData.weekDays = classData.weekDays;
+        }
+        
+        // Add monthly specific fields if present
+        if (classData.recurrencePattern === "MONTHLY" && classData.monthlyRule) {
+          initialRecurringData.monthlyWeekOrdinal = classData.monthlyRule.week;
+          initialRecurringData.monthlyWeekday = classData.monthlyRule.day;
+        }
+        
+        setRecurringData(initialRecurringData);
+      }
     }
   }, [classDetails]);
 
@@ -198,21 +251,32 @@ export default function Page() {
                   variant="default"
                   size="sm"
                   disabled={
-                    // Check only the essential fields for recurring setup (excluding trainer)
-                    !form.watch("title") || 
-                    !form.watch("type") || 
-                    !form.watch("availableSlot") || 
-                    !form.watch("date") || 
-                    !form.watch("timeFrom") || 
-                    !form.watch("timeTo") || 
-                    !form.watch("description") ||
-                    !!form.formState.errors.title ||
-                    !!form.formState.errors.type ||
-                    !!form.formState.errors.availableSlot ||
-                    !!form.formState.errors.date ||
-                    !!form.formState.errors.timeFrom ||
-                    !!form.formState.errors.timeTo ||
-                    !!form.formState.errors.description
+                    // In edit mode, only disable if there are validation errors
+                    classId ? (
+                      !!form.formState.errors.title ||
+                      !!form.formState.errors.type ||
+                      !!form.formState.errors.availableSlot ||
+                      !!form.formState.errors.date ||
+                      !!form.formState.errors.timeFrom ||
+                      !!form.formState.errors.timeTo ||
+                      !!form.formState.errors.description
+                    ) : (
+                      // In create mode, check all required fields
+                      !form.watch("title") || 
+                      !form.watch("type") || 
+                      !form.watch("availableSlot") || 
+                      !form.watch("date") || 
+                      !form.watch("timeFrom") || 
+                      !form.watch("timeTo") || 
+                      !form.watch("description") ||
+                      !!form.formState.errors.title ||
+                      !!form.formState.errors.type ||
+                      !!form.formState.errors.availableSlot ||
+                      !!form.formState.errors.date ||
+                      !!form.formState.errors.timeFrom ||
+                      !!form.formState.errors.timeTo ||
+                      !!form.formState.errors.description
+                    )
                   }
                   className="self-end h-[40px] leading-none text-white font-normal whitespace-nowrap px-4 text-sm bg-[#008080] hover:bg-[#006666] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                   onClick={async () => {
@@ -221,11 +285,11 @@ export default function Page() {
                     const isValid = await form.trigger(['title', 'type', 'availableSlot', 'date', 'timeFrom', 'timeTo', 'description']);
                     
                     if (!isValid) {
-                      toast.error("Please fill in all required fields and fix any errors before setting up recurring options");
+                      toast.error("Please fix any errors before setting up recurring options");
                       return;
                     }
                     
-                    if (form.getValues("media").length === 0) {
+                    if (!classId && form.getValues("media").length === 0) {
                       toast.error("Please upload at least one picture before setting up recurring options");
                       return;
                     }
@@ -233,9 +297,9 @@ export default function Page() {
                     // All validations passed - open recurring modal
                     setIsRecurringModalOpen(true);
                   }}
-                >
-                  Make Recurring
-                </Button>
+                  >
+                   {classId ? "Edit Recurring" : "Make Recurring"}
+                  </Button>
               </div>
 
               <div className="flex flex-row gap-6 items-center w-full justify-between">
@@ -267,9 +331,10 @@ export default function Page() {
         setIsOpen={setIsRecurringModalOpen}
         formTimeFrom={form.watch("timeFrom")}
         formTimeTo={form.watch("timeTo")}
+        initialData={classId ? recurringData : null}
         onSubmitRecurring={(data) => {
           setRecurringData(data);
-          toast.success("Recurring pattern added");
+          toast.success(classId ? "Recurring pattern updated" : "Recurring pattern added");
         }}
       />
     </section>

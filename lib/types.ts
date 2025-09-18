@@ -63,7 +63,7 @@ export interface IClass {
   availableSlot: string;
   location: string;
   room: string;
-  date: string;
+  date: string | null;
   price: string;
   timeFrom: string;
   timeTo: string;
@@ -78,6 +78,17 @@ export interface IClass {
   totalSlots: string;
   gym: string;
   shareableLink: string;
+  // Recurring properties
+  isRecurring?: boolean;
+  recurrencePattern?: "DAILY" | "WEEKLY" | "MONTHLY";
+  interval?: number;
+  weekDays?: string[];
+  rangeStart?: string;
+  rangeEnd?: string;
+  monthlyRule?: {
+    week?: string;
+    day?: string;
+  };
 }
 
 export interface IBookingResponse {
