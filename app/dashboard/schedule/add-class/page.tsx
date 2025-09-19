@@ -115,12 +115,48 @@ export default function Page() {
         formData.append("isRecurring", "true");
         formData.append("recurrencePattern", recurringData.recurrencePattern);
         formData.append("interval", recurringData.interval.toString());
-        formData.append("rangeStart", recurringData.rangeStart);
-        formData.append("rangeEnd", recurringData.rangeEnd);
+
+
+        try {
+          const [y, m, d] = (recurringData.rangeStart.includes("T") ? recurringData.rangeStart.split("T")[0] : recurringData.rangeStart).split("-").map(Number);
+          const startUtc = new Date(Date.UTC(y, (m as number) - 1, d as number));
+          const adjusted = new Date(startUtc.getTime() - 24 * 60 * 60 * 1000);
+          const adjustedStr = adjusted.toISOString().split("T")[0];
+          formData.append("rangeStart", adjustedStr);
+        } catch {
+          formData.append("rangeStart", recurringData.rangeStart);
+        }
+
+        if (recurringData.recurrencePattern === "DAILY") {
+          try {
+            const [ey, em, ed] = (recurringData.rangeEnd.includes("T") ? recurringData.rangeEnd.split("T")[0] : recurringData.rangeEnd).split("-").map(Number);
+            const endUtc = new Date(Date.UTC(ey, (em as number) - 1, ed as number));
+            const adjustedEnd = new Date(endUtc.getTime() - 24 * 60 * 60 * 1000);
+            const adjustedEndStr = adjustedEnd.toISOString().split("T")[0];
+            formData.append("rangeEnd", adjustedEndStr);
+          } catch {
+            formData.append("rangeEnd", recurringData.rangeEnd);
+          }
+        } else {
+          formData.append("rangeEnd", recurringData.rangeEnd);
+        }
         
         // Add weekDays if present
         if (recurringData.weekDays && recurringData.weekDays.length > 0) {
-          recurringData.weekDays.forEach((day, index) => {
+          const shiftBackOne = (day: string) => {
+            const order = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] as const;
+            const index = order.indexOf(day as any);
+            if (index === -1) return day;
+            const prevIndex = (index + 6) % 7; // shift -1
+            return order[prevIndex];
+          };
+
+          const weekDaysToSend =
+            recurringData.recurrencePattern === "WEEKLY"
+              ? recurringData.weekDays.map((d) => shiftBackOne(d))
+              : recurringData.weekDays;
+
+          weekDaysToSend.forEach((day, index) => {
             formData.append(`weekDays[${index}]`, day);
           });
         }
