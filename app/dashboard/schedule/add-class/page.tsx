@@ -93,6 +93,20 @@ export default function Page() {
         }
         if (key == "price" && form.getValues("free") == true) return;
 
+        if (key == "date" && typeof value === "string") {
+          try {
+            const dateObj = new Date(value);
+            const year = dateObj.getFullYear();
+            const month = dateObj.getMonth();
+            const day = dateObj.getDate();
+            const normalized = new Date(Date.UTC(year, month, day)).toISOString();
+            formData.append("date", normalized);
+          } catch (_) {
+            formData.append("date", value as any);
+          }
+          return;
+        }
+
         formData.append(key, value as any);
       });
       
@@ -246,51 +260,27 @@ export default function Page() {
                   labelClassName="invisible"
                 />
                   
-                <Button
-                  type="button"
-                  variant="default"
-                  size="sm"
-                  disabled={
-                    // In edit mode, only disable if there are validation errors
-                    classId ? (
-                      !!form.formState.errors.title ||
-                      !!form.formState.errors.type ||
-                      !!form.formState.errors.availableSlot ||
-                      !!form.formState.errors.date ||
-                      !!form.formState.errors.timeFrom ||
-                      !!form.formState.errors.timeTo ||
-                      !!form.formState.errors.description
-                    ) : (
-                      // In create mode, check all required fields
-                      !form.watch("title") || 
-                      !form.watch("type") || 
-                      !form.watch("availableSlot") || 
+                  <Button
+                    type="button"
+                    variant="default"
+                    size="sm"
+                    disabled={
+                      // Only check date and time fields
                       !form.watch("date") || 
                       !form.watch("timeFrom") || 
-                      !form.watch("timeTo") || 
-                      !form.watch("description") ||
-                      !!form.formState.errors.title ||
-                      !!form.formState.errors.type ||
-                      !!form.formState.errors.availableSlot ||
+                      !form.watch("timeTo") ||
                       !!form.formState.errors.date ||
                       !!form.formState.errors.timeFrom ||
-                      !!form.formState.errors.timeTo ||
-                      !!form.formState.errors.description
-                    )
-                  }
+                      !!form.formState.errors.timeTo
+                    }
                   className="self-end h-[40px] leading-none text-white font-normal whitespace-nowrap px-4 text-sm bg-[#008080] hover:bg-[#006666] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                   onClick={async () => {
                     
-                    // Validate specific fields excluding trainer for recurring setup
-                    const isValid = await form.trigger(['title', 'type', 'availableSlot', 'date', 'timeFrom', 'timeTo', 'description']);
+                    // Only validate date and time fields for recurring setup
+                    const isValid = await form.trigger(['date', 'timeFrom', 'timeTo']);
                     
                     if (!isValid) {
-                      toast.error("Please fix any errors before setting up recurring options");
-                      return;
-                    }
-                    
-                    if (!classId && form.getValues("media").length === 0) {
-                      toast.error("Please upload at least one picture before setting up recurring options");
+                      toast.error("Please provide valid date and time before setting up recurring options");
                       return;
                     }
                     
@@ -331,6 +321,7 @@ export default function Page() {
         setIsOpen={setIsRecurringModalOpen}
         formTimeFrom={form.watch("timeFrom")}
         formTimeTo={form.watch("timeTo")}
+        formDate={form.watch("date")}
         initialData={classId ? recurringData : null}
         onSubmitRecurring={(data) => {
           setRecurringData(data);
