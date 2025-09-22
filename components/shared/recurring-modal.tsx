@@ -12,6 +12,7 @@ interface IProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   formTimeFrom?: string;
   formTimeTo?: string;
+  formDate?: string;
   initialData?: RecurringData | null;
   onSubmitRecurring?: (recurringData: RecurringData) => void;
 }
@@ -86,7 +87,7 @@ const formatDuration = (minutes: number): string => {
   return `${hours}h ${remainingMinutes}m`;
 };
 
-export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, initialData, onSubmitRecurring }: IProps) => {
+export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, formDate, initialData, onSubmitRecurring }: IProps) => {
   const [startTime, setStartTime] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
   const [duration, setDuration] = useState<string>("");
@@ -176,16 +177,49 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, in
 
   // Initialize with form values when modal opens
   useEffect(() => {
-    if (isOpen && formTimeFrom && formTimeTo) {
-      setStartTime(formTimeFrom);
-      setEndTime(formTimeTo);
-      // Immediately calculate and set duration when modal opens
-      const calculatedDuration = calculateDuration(formTimeFrom, formTimeTo);
-      if (calculatedDuration > 0) {
-        setDuration(calculatedDuration.toString());
+    if (isOpen) {
+      // Set time values if available
+      if (formTimeFrom && formTimeTo) {
+        setStartTime(formTimeFrom);
+        setEndTime(formTimeTo);
+        // Immediately calculate and set duration when modal opens
+        const calculatedDuration = calculateDuration(formTimeFrom, formTimeTo);
+        if (calculatedDuration > 0) {
+          setDuration(calculatedDuration.toString());
+        }
       }
     }
   }, [isOpen, formTimeFrom, formTimeTo]);
+
+  useEffect(() => {
+    if (isOpen && formDate) {
+      console.log("Setting start date:", formDate);
+      
+      try {
+        let formattedDate: string;
+        
+        if (formDate.includes('T')) {
+          const d = new Date(formDate);
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          formattedDate = `${y}-${m}-${day}`;
+        } else {
+          formattedDate = formDate;
+        }
+        
+        console.log("Formatted start date:", formattedDate);
+        
+        setRangeStart(formattedDate);
+        
+        if (!rangeEnd && !initialData) {
+          setRangeEnd('');
+        }
+      } catch (e) {
+        console.error("Error setting start date:", e);
+      }
+    }
+  }, [isOpen, formDate, rangeEnd, initialData]);
 
   // Generate time options based on form values and ensure current selections remain selectable
   const startTimeOptions = useMemo(() => {
@@ -272,15 +306,34 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, in
             const startDate = new Date(initialData.rangeStart);
             setMonthlyDay(startDate.getDate());
           } catch (e) {
-            setMonthlyDay(1); // Default to 1st day
+            setMonthlyDay(1); 
           }
         }
       }
       
       setRangeStart(initialData.rangeStart);
       setRangeEnd(initialData.rangeEnd);
+    } else if (isOpen && formDate && !initialData) {
+
+      try {
+        let formattedDate: string;
+        
+        if (formDate.includes('T')) {
+          const d = new Date(formDate);
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          formattedDate = `${y}-${m}-${day}`;
+        } else {
+          formattedDate = formDate;
+        }
+        
+        setRangeStart(formattedDate);
+      } catch (e) {
+        console.error("Error formatting form date:", e);
+      }
     }
-  }, [initialData, isOpen, weeklyDays]);
+  }, [initialData, isOpen, weeklyDays, formDate]);
 
   useEffect(() => {
     if (recurrencePattern === "daily") {
