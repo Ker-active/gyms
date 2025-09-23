@@ -114,20 +114,12 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
     };
     
     // Pattern-specific data
-    if (recurrencePattern === "daily") {
+      if (recurrencePattern === "daily") {
       recurringData.recurrencePattern = "DAILY";
       
-      if (dailyWeekdayEnabled) {
-        // Every weekday (Mon-Fri)
-        recurringData.interval = 1;
-        recurringData.weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-      } else {
-        // Every N days
-        recurringData.interval = dailyInterval;
-        // Do not include weekDays for regular daily recurrence
-        // Explicitly set to empty array to ensure we don't send weekDays
-        recurringData.weekDays = [];
-      }
+    
+      recurringData.interval = dailyInterval;
+  recurringData.weekDays = [];
     } else if (recurrencePattern === "weekly") {
       recurringData.recurrencePattern = "WEEKLY";
       recurringData.interval = weeklyInterval;
@@ -516,7 +508,7 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
                       }}
                       className="h-6 w-6 rounded-[8px] border border-[#CFD3D4] data-[state=checked]:bg-[#008080] data-[state=checked]:border-[#008080] data-[state=checked]:ring-1 data-[state=checked]:ring-[#008080] data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-white data-[state=checked]:text-[#B0CAD9]"
                     />
-                    <span className="font-inter text-[14px] text-[#000000]">Every weekday</span>
+                    <span className="font-inter text-[14px] text-[#000000]">Every day</span>
                   </label>
                 </div>
               </div>
