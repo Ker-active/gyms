@@ -1,21 +1,29 @@
 import { z } from "zod";
 
 const timeValidation = (data: any) => {
-  // If either time is missing, let the required validation handle it
+
   if (!data.timeFrom || !data.timeTo) return true;
 
-  // Convert time strings to Date objects for comparison
-  const timeFrom = new Date(`1970-01-01T${data.timeFrom}`);
-  const timeTo = new Date(`1970-01-01T${data.timeTo}`);
+  let timeFromHour = parseInt(data.timeFrom.split(':')[0]);
+  let timeFromMin = parseInt(data.timeFrom.split(':')[1]);
+  let timeToHour = parseInt(data.timeTo.split(':')[0]);
+  let timeToMin = parseInt(data.timeTo.split(':')[1]);
+  
 
-  // Calculate difference in minutes
+  if (data.timeFrom.includes('AM') && timeFromHour === 12) timeFromHour = 0;
+  if (data.timeTo.includes('AM') && timeToHour === 12) timeToHour = 0;
+  if (data.timeFrom.includes('PM') && timeFromHour !== 12) timeFromHour += 12;
+  if (data.timeTo.includes('PM') && timeToHour !== 12) timeToHour += 12;
+  
+
+  const timeFrom = new Date(1970, 0, 1, timeFromHour, timeFromMin);
+  const timeTo = new Date(1970, 0, 1, timeToHour, timeToMin);
+
   const diffInMinutes = (timeTo.getTime() - timeFrom.getTime()) / (1000 * 60);
 
-  // Check if timeFrom is before timeTo and difference is at least 10 minutes
   return timeFrom < timeTo && diffInMinutes >= 10;
 };
 
-// Create the base schema first
 const BaseSchema = z.object({
   title: z.string().min(1, { message: "Required" }),
   type: z.string().min(1, { message: "Required" }),
@@ -33,7 +41,6 @@ const BaseSchema = z.object({
   media: z.any(),
 });
 
-// Create base versions of both schemas
 const BaseClassSchema = BaseSchema;
 const BaseEventSchema = BaseSchema.pick({
   title: true,
@@ -49,7 +56,6 @@ const BaseEventSchema = BaseSchema.pick({
   media: true,
 });
 
-// Add the price validation refinement
 const priceValidation = (data: any) => {
   if (!data.free && !data.price) {
     return false;
@@ -57,7 +63,6 @@ const priceValidation = (data: any) => {
   return true;
 };
 
-// Create the final schemas with validation
 export const AddClassSchema = BaseClassSchema.refine(priceValidation, {
   message: "Price is required",
   path: ["price"],
