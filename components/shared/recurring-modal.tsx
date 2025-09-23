@@ -169,49 +169,29 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
 
   // Initialize with form values when modal opens
   useEffect(() => {
-    if (isOpen) {
-      // Set time values if available
-      if (formTimeFrom && formTimeTo) {
-        setStartTime(formTimeFrom);
-        setEndTime(formTimeTo);
-        // Immediately calculate and set duration when modal opens
-        const calculatedDuration = calculateDuration(formTimeFrom, formTimeTo);
-        if (calculatedDuration > 0) {
-          setDuration(calculatedDuration.toString());
-        }
+    // Only initialize time values when the modal first opens
+    if (!isOpen) return;
+    
+    // Set time values if available
+    if (formTimeFrom && formTimeTo) {
+      setStartTime(formTimeFrom);
+      setEndTime(formTimeTo);
+      
+      // Immediately calculate and set duration when modal opens - do this only once
+      const calculatedDuration = calculateDuration(formTimeFrom, formTimeTo);
+      if (calculatedDuration > 0) {
+        setDuration(calculatedDuration.toString());
+        // Reset the manual change flag when we initialize from props
+        setIsDurationManuallyChanged(false);
       }
     }
+    
+    // Include formTimeFrom and formTimeTo in dependencies,
+    // but this effect is protected by the isOpen check to avoid loops
   }, [isOpen, formTimeFrom, formTimeTo]);
 
-  useEffect(() => {
-    if (isOpen && formDate) {
-      console.log("Setting start date:", formDate);
-      
-      try {
-        let formattedDate: string;
-        
-        if (formDate.includes('T')) {
-          const d = new Date(formDate);
-          const y = d.getFullYear();
-          const m = String(d.getMonth() + 1).padStart(2, '0');
-          const day = String(d.getDate()).padStart(2, '0');
-          formattedDate = `${y}-${m}-${day}`;
-        } else {
-          formattedDate = formDate;
-        }
-        
-        console.log("Formatted start date:", formattedDate);
-        
-        setRangeStart(formattedDate);
-        
-        if (!rangeEnd && !initialData) {
-          setRangeEnd('');
-        }
-      } catch (e) {
-        console.error("Error setting start date:", e);
-      }
-    }
-  }, [isOpen, formDate, rangeEnd, initialData]);
+  // This functionality is now handled in the main initialization effect
+  // No need for a separate useEffect that might cause update cycles
 
   // Generate time options based on form values and ensure current selections remain selectable
   const startTimeOptions = useMemo(() => {
@@ -241,7 +221,7 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
     return base;
   }, [formTimeTo, endTime]);
 
-  // Calculate duration automatically when start/end times change (but not when duration was manually changed)
+
   const [isDurationManuallyChanged, setIsDurationManuallyChanged] = useState(false);
   
   useEffect(() => {
@@ -254,8 +234,12 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
   }, [startTime, endTime, isDurationManuallyChanged]);
 
   useEffect(() => {
-    if (initialData && isOpen) {
-      const currentWeeklyDays = { ...weeklyDays };
+    // Only run initialization when modal opens with initialData or formDate
+    if (!isOpen) return;
+    
+    // Handle initialization with initialData (editing an existing recurring class)
+    if (initialData) {
+      // Set recurrence pattern first
       if (initialData.recurrencePattern === "DAILY") {
         setRecurrencePattern("daily");
         
@@ -276,11 +260,29 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
         setRecurrencePattern("weekly");
         setWeeklyInterval(initialData.interval);
         
+
         if (initialData.weekDays && initialData.weekDays.length > 0) {
-          const newWeeklyDays = { ...currentWeeklyDays };
+
+          const newWeeklyDays = { 
+            Monday: false,
+            Tuesday: false,
+            Wednesday: false,
+            Thursday: false,
+            Friday: false,
+            Saturday: false,
+            Sunday: false
+          };
+          
           initialData.weekDays.forEach(day => {
-            newWeeklyDays[day] = true;
+            if (day === "Monday") newWeeklyDays.Monday = true;
+            else if (day === "Tuesday") newWeeklyDays.Tuesday = true;
+            else if (day === "Wednesday") newWeeklyDays.Wednesday = true;
+            else if (day === "Thursday") newWeeklyDays.Thursday = true;
+            else if (day === "Friday") newWeeklyDays.Friday = true;
+            else if (day === "Saturday") newWeeklyDays.Saturday = true;
+            else if (day === "Sunday") newWeeklyDays.Sunday = true;
           });
+          
           setWeeklyDays(newWeeklyDays);
         }
       } else if (initialData.recurrencePattern === "MONTHLY") {
@@ -305,8 +307,9 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
       
       setRangeStart(initialData.rangeStart);
       setRangeEnd(initialData.rangeEnd);
-    } else if (isOpen && formDate && !initialData) {
+    } 
 
+    else if (formDate) {
       try {
         let formattedDate: string;
         
@@ -325,7 +328,9 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
         console.error("Error formatting form date:", e);
       }
     }
-  }, [initialData, isOpen, weeklyDays, formDate]);
+    
+  
+  }, [initialData, isOpen, formDate]);
 
   useEffect(() => {
     if (recurrencePattern === "daily") {
