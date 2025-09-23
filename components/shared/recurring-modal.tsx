@@ -100,11 +100,9 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
   const [rangeStart, setRangeStart] = useState<string>("");
   const [rangeEnd, setRangeEnd] = useState<string>("");
 
-  // Handle form submission for recurring pattern
   const handleSubmitRecurring = () => {
     if (!onSubmitRecurring) return;
-    
-    // Build recurring data based on selected pattern
+
     const recurringData: RecurringData = {
       isRecurring: true,
       recurrencePattern: "DAILY", // Default, will be overridden if needed
@@ -113,7 +111,6 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
       rangeEnd
     };
     
-    // Pattern-specific data
       if (recurrencePattern === "daily") {
       recurringData.recurrencePattern = "DAILY";
       
@@ -124,7 +121,6 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
       recurringData.recurrencePattern = "WEEKLY";
       recurringData.interval = weeklyInterval;
       
-      // Add selected days
       const selectedDays = Object.entries(weeklyDays)
         .filter(([_, selected]) => selected)
         .map(([day]) => day);
@@ -139,12 +135,10 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
       recurringData.monthlyWeekday = monthlyWeekday;
     }
     
-    // Submit data
     onSubmitRecurring(recurringData);
     setIsOpen(false); // Close modal after submission
   };
 
-  // Weekly state
   const [weeklyInterval, setWeeklyInterval] = useState<number>(1);
   const [weeklyDays, setWeeklyDays] = useState<Record<string, boolean>>({
     Monday: true,
@@ -160,40 +154,29 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
     setWeeklyDays((prev) => ({ ...prev, [day]: !prev[day as keyof typeof prev] }));
   };
 
-  // Monthly state
   const [monthlyInterval, setMonthlyInterval] = useState<number>(1);
   const [monthlyMode, setMonthlyMode] = useState<"day" | "weekday">("weekday");
   const [monthlyDay, setMonthlyDay] = useState<number>(1);
   const [monthlyWeekOrdinal, setMonthlyWeekOrdinal] = useState<string>("First");
   const [monthlyWeekday, setMonthlyWeekday] = useState<string>("Monday");
 
-  // Initialize with form values when modal opens
   useEffect(() => {
-    // Only initialize time values when the modal first opens
+
     if (!isOpen) return;
     
-    // Set time values if available
     if (formTimeFrom && formTimeTo) {
       setStartTime(formTimeFrom);
       setEndTime(formTimeTo);
       
-      // Immediately calculate and set duration when modal opens - do this only once
       const calculatedDuration = calculateDuration(formTimeFrom, formTimeTo);
       if (calculatedDuration > 0) {
         setDuration(calculatedDuration.toString());
-        // Reset the manual change flag when we initialize from props
         setIsDurationManuallyChanged(false);
       }
     }
     
-    // Include formTimeFrom and formTimeTo in dependencies,
-    // but this effect is protected by the isOpen check to avoid loops
+
   }, [isOpen, formTimeFrom, formTimeTo]);
-
-  // This functionality is now handled in the main initialization effect
-  // No need for a separate useEffect that might cause update cycles
-
-  // Generate time options based on form values and ensure current selections remain selectable
   const startTimeOptions = useMemo(() => {
     const base = generateTimeOptionsFromBase(formTimeFrom || "");
     if (startTime && !base.includes(startTime)) {
@@ -209,7 +192,6 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
 
   const endTimeOptions = useMemo(() => {
     const base = generateTimeOptionsFromBase(formTimeTo || "");
-    // Ensure currently selected endTime is in the list so the Select doesn't show empty
     if (endTime && !base.includes(endTime)) {
       const withCurrent = [...base, endTime];
       return withCurrent.sort((a, b) => {
@@ -234,12 +216,10 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
   }, [startTime, endTime, isDurationManuallyChanged]);
 
   useEffect(() => {
-    // Only run initialization when modal opens with initialData or formDate
     if (!isOpen) return;
     
-    // Handle initialization with initialData (editing an existing recurring class)
+
     if (initialData) {
-      // Set recurrence pattern first
       if (initialData.recurrencePattern === "DAILY") {
         setRecurrencePattern("daily");
         
