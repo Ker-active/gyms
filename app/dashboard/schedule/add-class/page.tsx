@@ -171,11 +171,7 @@ export default function Page() {
             formData.append("monthlyRule[day]", recurringData.monthlyWeekday.toLowerCase());
           }
         }
-      } else {
-        // Explicitly set isRecurring to false for non-recurring classes
-        formData.append("isRecurring", "false");
       }
-      // Form data ready for submission
       return classId ? client.put(`/class/edit/${classId}`, formData) : client.post(`/class/create`, formData);
     },
     onError: (error) => {
