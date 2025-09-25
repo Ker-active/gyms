@@ -94,8 +94,18 @@ export default function Page({ params }: { params: { slug: string } }) {
             </div>
           </div>
           <div className="flex flex-row items-center justify-between">
-            <h3 className="text-[#008080]  font-semibold font-inter">
-              {data?.data?.date ? format(new Date(data.data.date as string | number | Date), "EEEE, MMMM d") : "Date TBA"}, {data?.data?.timeFrom ?? "--:--"} - {data?.data?.timeTo ?? "--:--"}
+            <h3 className="text-[#008080] font-semibold font-inter">
+              {data?.data?.date 
+                ? `${format(new Date(data.data.date as string | number | Date), "EEEE, MMMM d")}`
+                : data?.data?.isRecurring 
+                  ? `${data?.data?.recurrencePattern === "DAILY" 
+                      ? "Daily" 
+                      : data?.data?.recurrencePattern === "WEEKLY" 
+                        ? "Weekly" 
+                        : data?.data?.recurrencePattern === "MONTHLY" 
+                          ? "Monthly" 
+                          : "Recurring"} (${data?.data?.rangeStart ? format(new Date(data?.data?.rangeStart), "MMM d") : ''} - ${data?.data?.rangeEnd ? format(new Date(data?.data?.rangeEnd), "MMM d, yyyy") : ''})`
+                  : "Date TBA"}, {data?.data?.timeFrom ?? "--:--"} - {data?.data?.timeTo ?? "--:--"}
             </h3>
             <p className="text-sm flex flex-row items-center gap-1 text-[#737373]">{data?.data?.totalSlots ?? 0} slots available</p>
           </div>

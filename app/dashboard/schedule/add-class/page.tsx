@@ -141,8 +141,10 @@ export default function Page() {
           formData.append("rangeEnd", recurringData.rangeEnd);
         }
         
-        // Add weekDays if present
-        if (recurringData.weekDays && recurringData.weekDays.length > 0) {
+        if (recurringData.weekDays && 
+            recurringData.weekDays.length > 0 && 
+            recurringData.recurrencePattern !== "DAILY") {
+          
           const shiftBackOne = (day: string) => {
             const order = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] as const;
             const index = order.indexOf(day as any);
@@ -151,14 +153,13 @@ export default function Page() {
             return order[prevIndex];
           };
 
-          const weekDaysToSend =
-            recurringData.recurrencePattern === "WEEKLY"
-              ? recurringData.weekDays.map((d) => shiftBackOne(d))
-              : recurringData.weekDays;
-
-          weekDaysToSend.forEach((day, index) => {
-            formData.append(`weekDays[${index}]`, day);
-          });
+          if (recurringData.recurrencePattern === "WEEKLY") {
+            const weekDaysToSend = recurringData.weekDays.map((d) => shiftBackOne(d));
+            
+            weekDaysToSend.forEach((day, index) => {
+              formData.append(`weekDays[${index}]`, day);
+            });
+          }
         }
         
         // Add monthly specific fields if present
@@ -170,11 +171,7 @@ export default function Page() {
             formData.append("monthlyRule[day]", recurringData.monthlyWeekday.toLowerCase());
           }
         }
-      } else {
-        // Explicitly set isRecurring to false for non-recurring classes
-        formData.append("isRecurring", "false");
       }
-      // Form data ready for submission
       return classId ? client.put(`/class/edit/${classId}`, formData) : client.post(`/class/create`, formData);
     },
     onError: (error) => {

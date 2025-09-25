@@ -100,11 +100,9 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
   const [rangeStart, setRangeStart] = useState<string>("");
   const [rangeEnd, setRangeEnd] = useState<string>("");
 
-  // Handle form submission for recurring pattern
   const handleSubmitRecurring = () => {
     if (!onSubmitRecurring) return;
-    
-    // Build recurring data based on selected pattern
+
     const recurringData: RecurringData = {
       isRecurring: true,
       recurrencePattern: "DAILY", // Default, will be overridden if needed
@@ -113,26 +111,16 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
       rangeEnd
     };
     
-    // Pattern-specific data
-    if (recurrencePattern === "daily") {
+      if (recurrencePattern === "daily") {
       recurringData.recurrencePattern = "DAILY";
       
-      if (dailyWeekdayEnabled) {
-        // Every weekday (Mon-Fri)
-        recurringData.interval = 1;
-        recurringData.weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-      } else {
-        // Every N days
-        recurringData.interval = dailyInterval;
-        // Do not include weekDays for regular daily recurrence
-        // Explicitly set to empty array to ensure we don't send weekDays
-        recurringData.weekDays = [];
-      }
+    
+      recurringData.interval = dailyInterval;
+  recurringData.weekDays = [];
     } else if (recurrencePattern === "weekly") {
       recurringData.recurrencePattern = "WEEKLY";
       recurringData.interval = weeklyInterval;
       
-      // Add selected days
       const selectedDays = Object.entries(weeklyDays)
         .filter(([_, selected]) => selected)
         .map(([day]) => day);
@@ -147,12 +135,10 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
       recurringData.monthlyWeekday = monthlyWeekday;
     }
     
-    // Submit data
     onSubmitRecurring(recurringData);
     setIsOpen(false); // Close modal after submission
   };
 
-  // Weekly state
   const [weeklyInterval, setWeeklyInterval] = useState<number>(1);
   const [weeklyDays, setWeeklyDays] = useState<Record<string, boolean>>({
     Monday: true,
@@ -168,60 +154,29 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
     setWeeklyDays((prev) => ({ ...prev, [day]: !prev[day as keyof typeof prev] }));
   };
 
-  // Monthly state
   const [monthlyInterval, setMonthlyInterval] = useState<number>(1);
   const [monthlyMode, setMonthlyMode] = useState<"day" | "weekday">("weekday");
   const [monthlyDay, setMonthlyDay] = useState<number>(1);
   const [monthlyWeekOrdinal, setMonthlyWeekOrdinal] = useState<string>("First");
   const [monthlyWeekday, setMonthlyWeekday] = useState<string>("Monday");
 
-  // Initialize with form values when modal opens
   useEffect(() => {
-    if (isOpen) {
-      // Set time values if available
-      if (formTimeFrom && formTimeTo) {
-        setStartTime(formTimeFrom);
-        setEndTime(formTimeTo);
-        // Immediately calculate and set duration when modal opens
-        const calculatedDuration = calculateDuration(formTimeFrom, formTimeTo);
-        if (calculatedDuration > 0) {
-          setDuration(calculatedDuration.toString());
-        }
-      }
-    }
-  }, [isOpen, formTimeFrom, formTimeTo]);
 
-  useEffect(() => {
-    if (isOpen && formDate) {
-      console.log("Setting start date:", formDate);
+    if (!isOpen) return;
+    
+    if (formTimeFrom && formTimeTo) {
+      setStartTime(formTimeFrom);
+      setEndTime(formTimeTo);
       
-      try {
-        let formattedDate: string;
-        
-        if (formDate.includes('T')) {
-          const d = new Date(formDate);
-          const y = d.getFullYear();
-          const m = String(d.getMonth() + 1).padStart(2, '0');
-          const day = String(d.getDate()).padStart(2, '0');
-          formattedDate = `${y}-${m}-${day}`;
-        } else {
-          formattedDate = formDate;
-        }
-        
-        console.log("Formatted start date:", formattedDate);
-        
-        setRangeStart(formattedDate);
-        
-        if (!rangeEnd && !initialData) {
-          setRangeEnd('');
-        }
-      } catch (e) {
-        console.error("Error setting start date:", e);
+      const calculatedDuration = calculateDuration(formTimeFrom, formTimeTo);
+      if (calculatedDuration > 0) {
+        setDuration(calculatedDuration.toString());
+        setIsDurationManuallyChanged(false);
       }
     }
-  }, [isOpen, formDate, rangeEnd, initialData]);
+    
 
-  // Generate time options based on form values and ensure current selections remain selectable
+  }, [isOpen, formTimeFrom, formTimeTo]);
   const startTimeOptions = useMemo(() => {
     const base = generateTimeOptionsFromBase(formTimeFrom || "");
     if (startTime && !base.includes(startTime)) {
@@ -237,7 +192,6 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
 
   const endTimeOptions = useMemo(() => {
     const base = generateTimeOptionsFromBase(formTimeTo || "");
-    // Ensure currently selected endTime is in the list so the Select doesn't show empty
     if (endTime && !base.includes(endTime)) {
       const withCurrent = [...base, endTime];
       return withCurrent.sort((a, b) => {
@@ -249,7 +203,7 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
     return base;
   }, [formTimeTo, endTime]);
 
-  // Calculate duration automatically when start/end times change (but not when duration was manually changed)
+
   const [isDurationManuallyChanged, setIsDurationManuallyChanged] = useState(false);
   
   useEffect(() => {
@@ -262,8 +216,10 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
   }, [startTime, endTime, isDurationManuallyChanged]);
 
   useEffect(() => {
-    if (initialData && isOpen) {
-      const currentWeeklyDays = { ...weeklyDays };
+    if (!isOpen) return;
+    
+
+    if (initialData) {
       if (initialData.recurrencePattern === "DAILY") {
         setRecurrencePattern("daily");
         
@@ -284,11 +240,29 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
         setRecurrencePattern("weekly");
         setWeeklyInterval(initialData.interval);
         
+
         if (initialData.weekDays && initialData.weekDays.length > 0) {
-          const newWeeklyDays = { ...currentWeeklyDays };
+
+          const newWeeklyDays = { 
+            Monday: false,
+            Tuesday: false,
+            Wednesday: false,
+            Thursday: false,
+            Friday: false,
+            Saturday: false,
+            Sunday: false
+          };
+          
           initialData.weekDays.forEach(day => {
-            newWeeklyDays[day] = true;
+            if (day === "Monday") newWeeklyDays.Monday = true;
+            else if (day === "Tuesday") newWeeklyDays.Tuesday = true;
+            else if (day === "Wednesday") newWeeklyDays.Wednesday = true;
+            else if (day === "Thursday") newWeeklyDays.Thursday = true;
+            else if (day === "Friday") newWeeklyDays.Friday = true;
+            else if (day === "Saturday") newWeeklyDays.Saturday = true;
+            else if (day === "Sunday") newWeeklyDays.Sunday = true;
           });
+          
           setWeeklyDays(newWeeklyDays);
         }
       } else if (initialData.recurrencePattern === "MONTHLY") {
@@ -313,8 +287,9 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
       
       setRangeStart(initialData.rangeStart);
       setRangeEnd(initialData.rangeEnd);
-    } else if (isOpen && formDate && !initialData) {
+    } 
 
+    else if (formDate) {
       try {
         let formattedDate: string;
         
@@ -333,7 +308,9 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
         console.error("Error formatting form date:", e);
       }
     }
-  }, [initialData, isOpen, weeklyDays, formDate]);
+    
+  
+  }, [initialData, isOpen, formDate]);
 
   useEffect(() => {
     if (recurrencePattern === "daily") {
@@ -516,7 +493,7 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
                       }}
                       className="h-6 w-6 rounded-[8px] border border-[#CFD3D4] data-[state=checked]:bg-[#008080] data-[state=checked]:border-[#008080] data-[state=checked]:ring-1 data-[state=checked]:ring-[#008080] data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-white data-[state=checked]:text-[#B0CAD9]"
                     />
-                    <span className="font-inter text-[14px] text-[#000000]">Every weekday</span>
+                    <span className="font-inter text-[14px] text-[#000000]">Every day</span>
                   </label>
                 </div>
               </div>
