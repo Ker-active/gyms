@@ -32,48 +32,49 @@ export interface RecurringData {
 // Generate 4 time options in 15-minute intervals from a base time
 const generateTimeOptionsFromBase = (baseTime: string): string[] => {
   if (!baseTime) return [];
-  
-  const [hour, minute] = baseTime.split(':').map(Number);
+
+  const [hour, minute] = baseTime.split(":").map(Number);
   const baseMinutes = hour * 60 + minute;
   const options = [];
-  
+
   for (let i = 0; i < 4; i++) {
-    const totalMinutes = baseMinutes + (i * 15);
+    const totalMinutes = baseMinutes + i * 15;
     const newHour = Math.floor(totalMinutes / 60);
     const newMinute = totalMinutes % 60;
-    
-    if (newHour < 24) { // Don't go past midnight
-      const timeString = `${newHour.toString().padStart(2, '0')}:${newMinute.toString().padStart(2, '0')}`;
+
+    if (newHour < 24) {
+      // Don't go past midnight
+      const timeString = `${newHour.toString().padStart(2, "0")}:${newMinute.toString().padStart(2, "0")}`;
       options.push(timeString);
     }
   }
-  
+
   return options;
 };
 
 // Calculate duration between two times in minutes
 const calculateDuration = (startTime: string, endTime: string): number => {
   if (!startTime || !endTime) return 0;
-  
-  const [startHour, startMinute] = startTime.split(':').map(Number);
-  const [endHour, endMinute] = endTime.split(':').map(Number);
-  
+
+  const [startHour, startMinute] = startTime.split(":").map(Number);
+  const [endHour, endMinute] = endTime.split(":").map(Number);
+
   const startTotalMinutes = startHour * 60 + startMinute;
   const endTotalMinutes = endHour * 60 + endMinute;
-  
+
   return endTotalMinutes - startTotalMinutes;
 };
 
 // Add minutes to a time string
 const addMinutesToTime = (timeString: string, minutesToAdd: number): string => {
   if (!timeString) return "";
-  
-  const [hour, minute] = timeString.split(':').map(Number);
+
+  const [hour, minute] = timeString.split(":").map(Number);
   const totalMinutes = hour * 60 + minute + minutesToAdd;
   const newHour = Math.floor(totalMinutes / 60) % 24; // Wrap around to next day
   const newMinute = totalMinutes % 60;
-  
-  return `${newHour.toString().padStart(2, '0')}:${newMinute.toString().padStart(2, '0')}`;
+
+  return `${newHour.toString().padStart(2, "0")}:${newMinute.toString().padStart(2, "0")}`;
 };
 
 // Format duration for display
@@ -108,23 +109,22 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
       recurrencePattern: "DAILY", // Default, will be overridden if needed
       interval: 1, // Default
       rangeStart,
-      rangeEnd
+      rangeEnd,
     };
-    
-      if (recurrencePattern === "daily") {
+
+    if (recurrencePattern === "daily") {
       recurringData.recurrencePattern = "DAILY";
-      
-    
+
       recurringData.interval = dailyInterval;
-  recurringData.weekDays = [];
+      recurringData.weekDays = [];
     } else if (recurrencePattern === "weekly") {
       recurringData.recurrencePattern = "WEEKLY";
       recurringData.interval = weeklyInterval;
-      
+
       const selectedDays = Object.entries(weeklyDays)
         .filter(([_, selected]) => selected)
         .map(([day]) => day);
-        
+
       if (selectedDays.length > 0) {
         recurringData.weekDays = selectedDays;
       }
@@ -134,7 +134,7 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
       recurringData.monthlyWeekOrdinal = monthlyWeekOrdinal;
       recurringData.monthlyWeekday = monthlyWeekday;
     }
-    
+
     onSubmitRecurring(recurringData);
     setIsOpen(false); // Close modal after submission
   };
@@ -161,21 +161,18 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
   const [monthlyWeekday, setMonthlyWeekday] = useState<string>("Monday");
 
   useEffect(() => {
-
     if (!isOpen) return;
-    
+
     if (formTimeFrom && formTimeTo) {
       setStartTime(formTimeFrom);
       setEndTime(formTimeTo);
-      
+
       const calculatedDuration = calculateDuration(formTimeFrom, formTimeTo);
       if (calculatedDuration > 0) {
         setDuration(calculatedDuration.toString());
         setIsDurationManuallyChanged(false);
       }
     }
-    
-
   }, [isOpen, formTimeFrom, formTimeTo]);
   const startTimeOptions = useMemo(() => {
     const base = generateTimeOptionsFromBase(formTimeFrom || "");
@@ -203,9 +200,8 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
     return base;
   }, [formTimeTo, endTime]);
 
-
   const [isDurationManuallyChanged, setIsDurationManuallyChanged] = useState(false);
-  
+
   useEffect(() => {
     if (startTime && endTime && !isDurationManuallyChanged) {
       const calculatedDuration = calculateDuration(startTime, endTime);
@@ -217,18 +213,20 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
 
   useEffect(() => {
     if (!isOpen) return;
-    
 
     if (initialData) {
       if (initialData.recurrencePattern === "DAILY") {
         setRecurrencePattern("daily");
-        
-        if (initialData.weekDays && initialData.weekDays.length === 5 && 
-            initialData.weekDays.includes("Monday") && 
-            initialData.weekDays.includes("Tuesday") && 
-            initialData.weekDays.includes("Wednesday") && 
-            initialData.weekDays.includes("Thursday") && 
-            initialData.weekDays.includes("Friday")) {
+
+        if (
+          initialData.weekDays &&
+          initialData.weekDays.length === 5 &&
+          initialData.weekDays.includes("Monday") &&
+          initialData.weekDays.includes("Tuesday") &&
+          initialData.weekDays.includes("Wednesday") &&
+          initialData.weekDays.includes("Thursday") &&
+          initialData.weekDays.includes("Friday")
+        ) {
           setDailyWeekdayEnabled(true);
           setDailyEveryEnabled(false);
         } else {
@@ -239,21 +237,19 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
       } else if (initialData.recurrencePattern === "WEEKLY") {
         setRecurrencePattern("weekly");
         setWeeklyInterval(initialData.interval);
-        
 
         if (initialData.weekDays && initialData.weekDays.length > 0) {
-
-          const newWeeklyDays = { 
+          const newWeeklyDays = {
             Monday: false,
             Tuesday: false,
             Wednesday: false,
             Thursday: false,
             Friday: false,
             Saturday: false,
-            Sunday: false
+            Sunday: false,
           };
-          
-          initialData.weekDays.forEach(day => {
+
+          initialData.weekDays.forEach((day) => {
             if (day === "Monday") newWeeklyDays.Monday = true;
             else if (day === "Tuesday") newWeeklyDays.Tuesday = true;
             else if (day === "Wednesday") newWeeklyDays.Wednesday = true;
@@ -262,54 +258,50 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
             else if (day === "Saturday") newWeeklyDays.Saturday = true;
             else if (day === "Sunday") newWeeklyDays.Sunday = true;
           });
-          
+
           setWeeklyDays(newWeeklyDays);
         }
       } else if (initialData.recurrencePattern === "MONTHLY") {
         setRecurrencePattern("monthly");
         setMonthlyInterval(initialData.interval);
-        
+
         if (initialData.monthlyWeekOrdinal && initialData.monthlyWeekday) {
           setMonthlyMode("weekday");
           setMonthlyWeekOrdinal(initialData.monthlyWeekOrdinal);
           setMonthlyWeekday(initialData.monthlyWeekday);
         } else {
           setMonthlyMode("day");
-          
+
           try {
             const startDate = new Date(initialData.rangeStart);
             setMonthlyDay(startDate.getDate());
           } catch (e) {
-            setMonthlyDay(1); 
+            setMonthlyDay(1);
           }
         }
       }
-      
+
       setRangeStart(initialData.rangeStart);
       setRangeEnd(initialData.rangeEnd);
-    } 
-
-    else if (formDate) {
+    } else if (formDate) {
       try {
         let formattedDate: string;
-        
-        if (formDate.includes('T')) {
+
+        if (formDate.includes("T")) {
           const d = new Date(formDate);
           const y = d.getFullYear();
-          const m = String(d.getMonth() + 1).padStart(2, '0');
-          const day = String(d.getDate()).padStart(2, '0');
+          const m = String(d.getMonth() + 1).padStart(2, "0");
+          const day = String(d.getDate()).padStart(2, "0");
           formattedDate = `${y}-${m}-${day}`;
         } else {
           formattedDate = formDate;
         }
-        
+
         setRangeStart(formattedDate);
       } catch (e) {
         console.error("Error formatting form date:", e);
       }
     }
-    
-  
   }, [initialData, isOpen, formDate]);
 
   useEffect(() => {
@@ -357,12 +349,10 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent hideCloseButton className="max-w-[450px] bg-[#F3F3F3] p-4">
-            <ScrollArea className="max-h-[85vh]" scrollBarThumbClassName="bg-transparent">
+      <DialogContent hideCloseButton className="max-w-[450px] bg-[#F3F3F3] p-4">
+        <ScrollArea className="max-h-[85vh]" scrollBarThumbClassName="bg-transparent">
           <div className="space-y-[15px]">
-            <h3 className="text-[#008080] font-inter font-bold text-[14px] leading-[18px]">
-              Class time
-            </h3>
+            <h3 className="text-[#008080] font-inter font-bold text-[14px] leading-[18px]">Class time</h3>
 
             <div className="space-y-2">
               <label className="text-[#666666] font-inter text-sm">Start</label>
@@ -412,53 +402,39 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
               </Select>
             </div>
           </div>
-           <div className="space-y-[7px] mt-[31px]">
-              <h4 className="text-[#008080] font-inter font-bold text-[14px] leading-[18px]">Recurrence pattern</h4>
-              <div className="border rounded-md bg-white overflow-hidden">
-                <div className="px-4 py-3 font-inter font-bold text-[16px] text-[#262626]">Select</div>
-                <div className="grid grid-cols-3 border-t">
-                  <label className="flex items-center justify-center gap-3 py-5 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="recurrence"
-                      value="daily"
-                      checked={recurrencePattern === "daily"}
-                      onChange={() => setRecurrencePattern("daily")}
-                      className="h-4 w-4 accent-[#008080]"
-                    />
-                    <span className="font-inter text-[14px] text-[#262626]">Daily</span>
-                  </label>
-                  <label className="flex items-center justify-center gap-3 py-5 cursor-pointer border-l">
-                    <input
-                      type="radio"
-                      name="recurrence"
-                      value="weekly"
-                      checked={recurrencePattern === "weekly"}
-                      onChange={() => setRecurrencePattern("weekly")}
-                      className="h-4 w-4 accent-[#008080]"
-                    />
-                    <span className="font-inter text-[14px] text-[#262626]">Weekly</span>
-                  </label>
-                  <label className="flex items-center justify-center gap-3 py-5 cursor-pointer border-l">
-                    <input
-                      type="radio"
-                      name="recurrence"
-                      value="monthly"
-                      checked={recurrencePattern === "monthly"}
-                      onChange={() => setRecurrencePattern("monthly")}
-                      className="h-4 w-4 accent-[#008080]"
-                    />
-                    <span className="font-inter text-[14px] text-[#262626]">Monthly</span>
-                  </label>
-                </div>
+          <div className="space-y-[7px] mt-[31px]">
+            <h4 className="text-[#008080] font-inter font-bold text-[14px] leading-[18px]">Recurrence pattern</h4>
+            <div className="border rounded-md bg-white overflow-hidden">
+              <div className="px-4 py-3 font-inter font-bold text-[16px] text-[#262626]">Select</div>
+              <div className="grid grid-cols-3 border-t">
+                <label className="flex items-center justify-center gap-3 py-5 cursor-pointer">
+                  <input type="radio" name="recurrence" value="daily" checked={recurrencePattern === "daily"} onChange={() => setRecurrencePattern("daily")} className="h-4 w-4 accent-[#008080]" />
+                  <span className="font-inter text-[14px] text-[#262626]">Daily</span>
+                </label>
+                <label className="flex items-center justify-center gap-3 py-5 cursor-pointer border-l">
+                  <input type="radio" name="recurrence" value="weekly" checked={recurrencePattern === "weekly"} onChange={() => setRecurrencePattern("weekly")} className="h-4 w-4 accent-[#008080]" />
+                  <span className="font-inter text-[14px] text-[#262626]">Weekly</span>
+                </label>
+                <label className="flex items-center justify-center gap-3 py-5 cursor-pointer border-l">
+                  <input
+                    type="radio"
+                    name="recurrence"
+                    value="monthly"
+                    checked={recurrencePattern === "monthly"}
+                    onChange={() => setRecurrencePattern("monthly")}
+                    className="h-4 w-4 accent-[#008080]"
+                  />
+                  <span className="font-inter text-[14px] text-[#262626]">Monthly</span>
+                </label>
               </div>
             </div>
+          </div>
 
-            {/* Daily options panel - render only when selected to avoid layout gap */}
-            {recurrencePattern === "daily" && (
-              <div ref={dailyPanelRef} className="mt-3 border rounded-md bg-white duration-300 ease-out animate-in fade-in-0 slide-in-from-top-2">
-                <div className="p-4 space-y-4">
-                  {/* <label className="flex items-center gap-3">
+          {/* Daily options panel - render only when selected to avoid layout gap */}
+          {recurrencePattern === "daily" && (
+            <div ref={dailyPanelRef} className="mt-3 border rounded-md bg-white duration-300 ease-out animate-in fade-in-0 slide-in-from-top-2">
+              <div className="p-4 space-y-4">
+                {/* <label className="flex items-center gap-3">
                     <input
                       type="checkbox"
                       checked={dailyEveryEnabled}
@@ -469,7 +445,7 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
                       }}
                       className="h-5 w-5 accent-[#008080] rounded"
                     /> */}
-                    {/* <span className="font-inter text-[16px] text-[#262626]">Every</span>
+                {/* <span className="font-inter text-[16px] text-[#262626]">Every</span>
                     <input
                       type="number"
                       min={1}
@@ -481,135 +457,146 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
                     <span className="font-inter text-[16px] text-[#262626]">Day(s)</span>
                   </label> */}
 
-                  {/* <hr className="border-t" /> */}
+                {/* <hr className="border-t" /> */}
 
-                  <label className="flex items-center gap-3">
-                    <Checkbox
-                      checked={dailyWeekdayEnabled}
-                      onCheckedChange={(val) => {
-                        const checked = Boolean(val);
-                        setDailyWeekdayEnabled(checked);
-                        if (checked) setDailyEveryEnabled(false);
-                      }}
-                      className="h-6 w-6 rounded-[8px] border border-[#CFD3D4] data-[state=checked]:bg-[#008080] data-[state=checked]:border-[#008080] data-[state=checked]:ring-1 data-[state=checked]:ring-[#008080] data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-white data-[state=checked]:text-[#B0CAD9]"
-                    />
-                    <span className="font-inter text-[14px] text-[#000000]">Every day</span>
-                  </label>
+                <label className="flex items-center gap-3">
+                  <Checkbox
+                    checked={dailyWeekdayEnabled}
+                    onCheckedChange={(val) => {
+                      const checked = Boolean(val);
+                      setDailyWeekdayEnabled(checked);
+                      if (checked) setDailyEveryEnabled(false);
+                    }}
+                    className="h-6 w-6 rounded-[8px] border border-[#CFD3D4] data-[state=checked]:bg-[#008080] data-[state=checked]:border-[#008080] data-[state=checked]:ring-1 data-[state=checked]:ring-[#008080] data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-white data-[state=checked]:text-[#B0CAD9]"
+                  />
+                  <span className="font-inter text-[14px] text-[#000000]">Every day</span>
+                </label>
+              </div>
+            </div>
+          )}
+
+          {/* Weekly options panel */}
+          {recurrencePattern === "weekly" && (
+            <div className="mt-3 border rounded-md bg-white duration-300 ease-out animate-in fade-in-0 slide-in-from-top-2">
+              <div className="p-4 space-y-4">
+                <label className="flex items-center gap-3">
+                  <Checkbox
+                    checked={true}
+                    className="h-6 w-6 rounded-[8px] border border-[#CFD3D4] data-[state=checked]:bg-[#008080] data-[state=checked]:border-[#008080] data-[state=checked]:ring-1 data-[state=checked]:ring-[#008080] data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-white data-[state=checked]:text-[#B0CAD9]"
+                  />
+                  <span className="font-inter text-[14px] text-[#262626]">Every</span>
+                  <input
+                    type="number"
+                    min={1}
+                    value={weeklyInterval}
+                    onChange={(e) => setWeeklyInterval(Math.max(1, Number(e.target.value)))}
+                    className="w-[39px] h-[24px]  rounded-[8px] text-center border focus:outline-none"
+                  />
+                  <span className="font-inter text-[14px] text-[#262626]">Week(s) on</span>
+                </label>
+
+                <hr className="border-t" />
+
+                <div className="grid grid-cols-3 gap-y-6 gap-x-0">
+                  {Object.keys(weeklyDays).map((day) => (
+                    <label key={day} className="flex items-center gap-3">
+                      <Checkbox
+                        checked={weeklyDays[day]}
+                        onCheckedChange={() => toggleWeeklyDay(day)}
+                        className="h-6 w-6 rounded-[8px] border border-[#CFD3D4] data-[state=checked]:bg-[#008080] data-[state=checked]:border-[#008080] data-[state=checked]:ring-1 data-[state=checked]:ring-[#008080] data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-white data-[state=checked]:text-[#B0CAD9]"
+                      />
+                      <span className="font-inter text-[14px] text-[#262626]">{day}</span>
+                    </label>
+                  ))}
                 </div>
               </div>
-            )}
+            </div>
+          )}
 
-            {/* Weekly options panel */}
-            {recurrencePattern === "weekly" && (
-              <div className="mt-3 border rounded-md bg-white duration-300 ease-out animate-in fade-in-0 slide-in-from-top-2">
-                <div className="p-4 space-y-4">
-                  <label className="flex items-center gap-3">
-                    <Checkbox
-                      checked={true}
-                      className="h-6 w-6 rounded-[8px] border border-[#CFD3D4] data-[state=checked]:bg-[#008080] data-[state=checked]:border-[#008080] data-[state=checked]:ring-1 data-[state=checked]:ring-[#008080] data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-white data-[state=checked]:text-[#B0CAD9]"
-                    />
-                    <span className="font-inter text-[14px] text-[#262626]">Every</span>
+          {/* Monthly options panel */}
+          {recurrencePattern === "monthly" && (
+            <div className="mt-3 border rounded-md bg-white duration-300 ease-out animate-in fade-in-0 slide-in-from-top-2">
+              <div className="p-4 space-y-4">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <span className="font-inter text-[14px] text-[#262626]">The</span>
+                    <Select value={monthlyWeekOrdinal} onValueChange={setMonthlyWeekOrdinal}>
+                      <SelectTrigger className="w-[130px] bg-white border border-gray-300 rounded-[8px] h-9 px-4">
+                        <SelectValue placeholder="First" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {["First", "Second", "Third", "Fourth", "Last"].map((o) => (
+                          <SelectItem key={o} value={o}>
+                            {o}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select value={monthlyWeekday} onValueChange={setMonthlyWeekday}>
+                      <SelectTrigger className="w-[120px] bg-white border border-gray-300 rounded-[8px] h-9 px-4">
+                        <SelectValue placeholder="Monday" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((d) => (
+                          <SelectItem key={d} value={d}>
+                            {d}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <span className="font-inter text-[14px] text-[#000000]">Of every</span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
                     <input
                       type="number"
                       min={1}
-                      value={weeklyInterval}
-                      onChange={(e) => setWeeklyInterval(Math.max(1, Number(e.target.value)))}
-                      className="w-[39px] h-[24px]  rounded-[8px] text-center border focus:outline-none"
+                      value={monthlyInterval}
+                      onChange={(e) => setMonthlyInterval(Math.max(1, Number(e.target.value)))}
+                      className="w-[39px] h-[24px] rounded-[8px] text-center border focus:outline-none"
                     />
-                    <span className="font-inter text-[14px] text-[#262626]">Week(s) on</span>
-                  </label>
-
-                  <hr className="border-t" />
-
-                  <div className="grid grid-cols-3 gap-y-6 gap-x-0">
-                    {Object.keys(weeklyDays).map((day) => (
-                      <label key={day} className="flex items-center gap-3">
-                        <Checkbox
-                          checked={weeklyDays[day]}
-                          onCheckedChange={() => toggleWeeklyDay(day)}
-                          className="h-6 w-6 rounded-[8px] border border-[#CFD3D4] data-[state=checked]:bg-[#008080] data-[state=checked]:border-[#008080] data-[state=checked]:ring-1 data-[state=checked]:ring-[#008080] data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-white data-[state=checked]:text-[#B0CAD9]"
-                        />
-                        <span className="font-inter text-[14px] text-[#262626]">{day}</span>
-                      </label>
-                    ))}
+                    <span className="font-inter text-[14px] text-[#262626]">Month(s)</span>
                   </div>
                 </div>
               </div>
-            )}
-
-            {/* Monthly options panel */}
-            {recurrencePattern === "monthly" && (
-              <div className="mt-3 border rounded-md bg-white duration-300 ease-out animate-in fade-in-0 slide-in-from-top-2">
-                <div className="p-4 space-y-4">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <span className="font-inter text-[14px] text-[#262626]">The</span>
-                      <Select value={monthlyWeekOrdinal} onValueChange={setMonthlyWeekOrdinal}>
-                        <SelectTrigger className="w-[130px] bg-white border border-gray-300 rounded-[8px] h-9 px-4">
-                          <SelectValue placeholder="First" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {['First','Second','Third','Fourth','Last'].map((o) => (
-                            <SelectItem key={o} value={o}>{o}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Select value={monthlyWeekday} onValueChange={setMonthlyWeekday}>
-                        <SelectTrigger className="w-[120px] bg-white border border-gray-300 rounded-[8px] h-9 px-4">
-                          <SelectValue placeholder="Monday" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map((d) => (
-                            <SelectItem key={d} value={d}>{d}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <span className="font-inter text-[14px] text-[#000000]">Of every</span>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="number"
-                        min={1}
-                        value={monthlyInterval}
-                        onChange={(e) => setMonthlyInterval(Math.max(1, Number(e.target.value)))}
-                        className="w-[39px] h-[24px] rounded-[8px] text-center border focus:outline-none"
-                      />
-                      <span className="font-inter text-[14px] text-[#262626]">Month(s)</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <h4 className="text-[#008080] font-inter font-bold text-[14px] leading-[18px] mt-[31px]">Range of recurrence</h4>
-              <div className="grid grid-cols-2 gap-6 items-start">
-                <div className="space-y-[15px]">
-                  <label className="text-[#000000] font-inter text-[14px] leading-4">Start by</label>
-                  <input
-                    type="date"
-                    value={rangeStart}
-                    onChange={(e) => setRangeStart(e.target.value)}
-                    className="h-[45px] w-full rounded-[5px] border border-[#E5E7EB] bg-white px-4 text-[14px] text-[#262626] focus:outline-none"
-                  />
-                </div>
-                <div className="space-y-[15px]">
-                  <label className="text-[#000000] font-inter text-[14px] leading-4">End by</label>
-                  <input
-                    type="date"
-                    value={rangeEnd}
-                    onChange={(e) => setRangeEnd(e.target.value)}
-                    className="h-[45px] w-full rounded-[5px] border border-[#E5E7EB] bg-white px-4 text-[14px] text-[#262626] focus:outline-none"
-                  />
-                </div>
-              </div>
-            
             </div>
+          )}
+
+          <div className="space-y-4">
+            <h4 className="text-[#008080] font-inter font-bold text-[14px] leading-[18px] mt-[31px]">Range of recurrence</h4>
+            <div className="grid grid-cols-2 gap-6 items-start">
+              <div className="space-y-[15px]">
+                <label className="text-[#000000] font-inter text-[14px] leading-4">Start by</label>
+                <input
+                  type="date"
+                  value={rangeStart}
+                  onChange={(e) => {
+                    const newStart = e.target.value;
+                    setRangeStart(newStart);
+                    // If end date is earlier than new start, reset it
+                    if (rangeEnd && rangeEnd < newStart) {
+                      setRangeEnd("");
+                    }
+                  }}
+                  className="h-[45px] w-full rounded-[5px] border border-[#E5E7EB] bg-white px-4 text-[14px] text-[#262626] focus:outline-none"
+                />
+              </div>
+              <div className="space-y-[15px]">
+                <label className="text-[#000000] font-inter text-[14px] leading-4">End by</label>
+                <input
+                  type="date"
+                  value={rangeEnd}
+                  min={rangeStart || undefined}
+                  onChange={(e) => setRangeEnd(e.target.value)}
+                  className="h-[45px] w-full rounded-[5px] border border-[#E5E7EB] bg-white px-4 text-[14px] text-[#262626] focus:outline-none"
+                />
+              </div>
+            </div>
+          </div>
 
           {/* Action buttons */}
           <div className="flex justify-center mt-[31px] gap-[10px]">
-            <button 
+            <button
               className="bg-[#008080] font-inter text-sm font-normal text-white px-[12px] py-[8px] rounded-[5px]"
               onClick={handleSubmitRecurring}
               disabled={!rangeStart || !rangeEnd || !recurrencePattern}
@@ -618,14 +605,13 @@ export const RecurringModal = ({ isOpen, setIsOpen, formTimeFrom, formTimeTo, fo
             </button>
 
             <DialogClose asChild>
-              <button className=" bg-[#008080] font-inter text-sm font-normal text-white px-[12px] py-[8px] rounded-[5px]" >Cancel</button>
+              <button className=" bg-[#008080] font-inter text-sm font-normal text-white px-[12px] py-[8px] rounded-[5px]">Cancel</button>
             </DialogClose>
 
-            <button className="bg-[#CBCBCB] text-[#FFFFFF] font-inter text-[14px] rounded-[6px] px-5 py-2">Remove Recurring
-            </button>
+            <button className="bg-[#CBCBCB] text-[#FFFFFF] font-inter text-[14px] rounded-[6px] px-5 py-2">Remove Recurring</button>
           </div>
-          </ScrollArea>
-        </DialogContent>
+        </ScrollArea>
+      </DialogContent>
     </Dialog>
   );
 };
