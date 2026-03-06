@@ -47,11 +47,11 @@ const links = [
   },
   {
     label: "Profile",
-    icon: "/members.svg",
+    icon: "/profile.svg",
   },
   {
     label: "Logout",
-    icon: "/members.svg",
+    icon: "/logout.svg",
   },
 ] as const;
 
@@ -69,10 +69,12 @@ export const Sidebar = ({ className, setIsSidebarOpen }: IProps) => {
       <ul className={"flex flex-col pt-[44px] gap-10"}>
         {links.map((item) => {
           const href = item.label === "Dashboard" ? Routes.home : `/dashboard/${item.label.toLowerCase()}`;
+          const isActive = item.label === "Dashboard" ? pathname === href : pathname.startsWith(href);
+
           const isDisabled = isLoading || !userData?.data?.fullname;
           return (
             <li className="flex flex-row px-10 items-center gap-4" key={item.label}>
-              {item.label != "Logout" && <Image src={item.icon} width={27} height={27} alt={`${item.label} Icon`} style={{ opacity: isDisabled ? 0.5 : 1 }} />}
+              {<Image src={item.icon} width={27} height={27} alt={`${item.label} Icon`} style={{ opacity: isDisabled ? 0.5 : 1 }} />}
               {isDisabled ? (
                 <span className="text-[#E1E2E7] text-base cursor-not-allowed">{item.label}</span>
               ) : (
@@ -91,7 +93,7 @@ export const Sidebar = ({ className, setIsSidebarOpen }: IProps) => {
                       {item.label}
                     </button>
                   ) : (
-                    <Link onClick={() => setIsSidebarOpen?.(false)} className={cn("text-[#565C78] text-base", pathname.includes(href) && "text-brand font-medium")} href={href}>
+                    <Link onClick={() => setIsSidebarOpen?.(false)} className={cn("text-[#565C78] text-base", isActive && "text-brand font-medium")} href={href}>
                       {item.label}
                     </Link>
                   )}

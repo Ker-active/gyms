@@ -32,7 +32,7 @@ export default function Page() {
   const { data: userData } = useGetUser();
   // const gymId = userData?.data?._id ?? null;
   const { data: gymTrainerData } = useGetGymTrainer(userData?.data?._id ?? null);
-  
+
   // Monitor data loading
   useEffect(() => {
     if (!userData?.data && !trainerData?.data && !gymTrainerData?.data) {
@@ -54,12 +54,12 @@ export default function Page() {
   const trainersOptions = useMemo(() => {
     // Try to get trainers from either source
     const trainers = gymTrainerData?.data || trainerData?.data || [];
-    
+
     const options = trainers.map((trainer) => ({
       value: trainer._id,
       label: trainer.fullname,
     }));
-    
+
     return options;
   }, [gymTrainerData?.data, trainerData?.data]);
 
@@ -68,10 +68,10 @@ export default function Page() {
     if (isNaN(Number(values.availableSlot))) {
       return toast.error("Available slot must be a number");
     }
-    
+
     // Convert availableSlot to a number to ensure it's sent correctly
     form.setValue("availableSlot", Number(values.availableSlot).toString());
-    
+
     if (form.getValues("media").length == 0) return toast.error("Picture is required");
     mutate({ ...values, recurringData });
   }
@@ -80,7 +80,7 @@ export default function Page() {
     mutationFn: (data: TClassSchema & { recurringData: RecurringData | null }) => {
       const formData = new FormData();
       const { recurringData, ...classData } = data;
-      
+
       // Add regular class data
       Object.entries(classData).forEach(([key, value]) => {
         if (value === undefined) return;
@@ -109,13 +109,12 @@ export default function Page() {
 
         formData.append(key, value as any);
       });
-      
+
       // Handle recurring data
       if (recurringData) {
         formData.append("isRecurring", "true");
         formData.append("recurrencePattern", recurringData.recurrencePattern);
         formData.append("interval", recurringData.interval.toString());
-
 
         try {
           const [y, m, d] = (recurringData.rangeStart.includes("T") ? recurringData.rangeStart.split("T")[0] : recurringData.rangeStart).split("-").map(Number);
@@ -140,11 +139,8 @@ export default function Page() {
         } else {
           formData.append("rangeEnd", recurringData.rangeEnd);
         }
-        
-        if (recurringData.weekDays && 
-            recurringData.weekDays.length > 0 && 
-            recurringData.recurrencePattern !== "DAILY") {
-          
+
+        if (recurringData.weekDays && recurringData.weekDays.length > 0 && recurringData.recurrencePattern !== "DAILY") {
           const shiftBackOne = (day: string) => {
             const order = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] as const;
             const index = order.indexOf(day as any);
@@ -155,13 +151,13 @@ export default function Page() {
 
           if (recurringData.recurrencePattern === "WEEKLY") {
             const weekDaysToSend = recurringData.weekDays.map((d) => shiftBackOne(d));
-            
+
             weekDaysToSend.forEach((day, index) => {
               formData.append(`weekDays[${index}]`, day);
             });
           }
         }
-        
+
         // Add monthly specific fields if present
         if (recurringData.recurrencePattern === "MONTHLY") {
           if (recurringData.monthlyWeekOrdinal) {
@@ -201,48 +197,48 @@ export default function Page() {
           day: string;
         };
       };
-      
+
       // Format date properly for the form
       let formattedDate = classData.date;
       if (classData.date === null && classData.isRecurring) {
         // For recurring classes with null date, use rangeStart as a fallback
         const startDate = new Date(classData.rangeStart);
-        formattedDate = startDate.toISOString().split('T')[0];
+        formattedDate = startDate.toISOString().split("T")[0];
       } else if (classData.date) {
         // Ensure date is in the correct format YYYY-MM-DD
-        formattedDate = new Date(classData.date).toISOString().split('T')[0];
+        formattedDate = new Date(classData.date).toISOString().split("T")[0];
       }
-      
+
       form.reset({
         ...classData,
-        date: formattedDate || '',
+        date: formattedDate || "",
         availableSlot: classData.availableSlot.toString(),
         price: classData?.price?.toString() || "",
         room: classData?.room?.toString() || "",
         trainer: classData.trainer._id,
       });
-      
+
       // Check if class is recurring and set the recurring data
       if (classData.isRecurring) {
         const initialRecurringData: RecurringData = {
           isRecurring: true,
           recurrencePattern: classData.recurrencePattern,
           interval: classData.interval,
-          rangeStart: new Date(classData.rangeStart).toISOString().split('T')[0],
-          rangeEnd: new Date(classData.rangeEnd).toISOString().split('T')[0],
+          rangeStart: new Date(classData.rangeStart).toISOString().split("T")[0],
+          rangeEnd: new Date(classData.rangeEnd).toISOString().split("T")[0],
         };
-        
+
         // Add weekDays if present
         if (classData.weekDays && classData.weekDays.length > 0) {
           initialRecurringData.weekDays = classData.weekDays;
         }
-        
+
         // Add monthly specific fields if present
         if (classData.recurrencePattern === "MONTHLY" && classData.monthlyRule) {
           initialRecurringData.monthlyWeekOrdinal = classData.monthlyRule.week;
           initialRecurringData.monthlyWeekday = classData.monthlyRule.day;
         }
-        
+
         setRecurringData(initialRecurringData);
       }
     }
@@ -282,47 +278,35 @@ export default function Page() {
               <FormInput<TClassSchema> containerClassName="w-full" placeholder="Enter" label="Room" name="room" />
               <FormDate<TClassSchema> containerClassName="w-full" name="date" />
 
-              <div className={cn("flex flex-row gap-2 items-end flex-wrap sm:flex-nowrap")}> 
+              <div className={cn("flex flex-row gap-2 items-end flex-wrap sm:flex-nowrap")}>
                 <FormInput<TClassSchema> name="timeFrom" label="Time" type="time" className="w-[100px] sm:w-[120px] px-3" />
                 <p className={cn("mt-auto", form.formState.errors?.timeFrom || form.formState.errors.timeTo ? "mb-9" : "mb-3")}>to</p>
-                <FormInput<TClassSchema>
-                  name="timeTo"
-                  type="time"
-                  className="w-[100px] sm:w-[120px] px-3"
-                  label="Time"
-                  labelClassName="invisible"
-                />
-                  
-                  <Button
-                    type="button"
-                    variant="default"
-                    size="sm"
-                    disabled={
-                      // Only check date and time fields
-                      !form.watch("date") || 
-                      !form.watch("timeFrom") || 
-                      !form.watch("timeTo") ||
-                      !!form.formState.errors.date ||
-                      !!form.formState.errors.timeFrom ||
-                      !!form.formState.errors.timeTo
-                    }
+                <FormInput<TClassSchema> name="timeTo" type="time" className="w-[100px] sm:w-[120px] px-3" label="Time" labelClassName="invisible" />
+
+                <Button
+                  type="button"
+                  variant="default"
+                  size="sm"
+                  disabled={
+                    // Only check date and time fields
+                    !form.watch("date") || !form.watch("timeFrom") || !form.watch("timeTo") || !!form.formState.errors.date || !!form.formState.errors.timeFrom || !!form.formState.errors.timeTo
+                  }
                   className="self-end h-[40px] leading-none text-white font-normal whitespace-nowrap px-4 text-sm bg-[#008080] hover:bg-[#006666] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                   onClick={async () => {
-                    
                     // Only validate date and time fields for recurring setup
-                    const isValid = await form.trigger(['date', 'timeFrom', 'timeTo']);
-                    
+                    const isValid = await form.trigger(["date", "timeFrom", "timeTo"]);
+
                     if (!isValid) {
                       toast.error("Please provide valid date and time before setting up recurring options");
                       return;
                     }
-                    
+
                     // All validations passed - open recurring modal
                     setIsRecurringModalOpen(true);
                   }}
-                  >
-                   {classId ? "Edit Recurring" : "Make Recurring"}
-                  </Button>
+                >
+                  {classId || recurringData ? "Edit Recurring" : "Make Recurring"}
+                </Button>
               </div>
 
               <div className="flex flex-row gap-6 items-center w-full justify-between">
@@ -349,8 +333,8 @@ export default function Page() {
           </form>
         </FormSchemaProvider>
       </Form>
-      <RecurringModal 
-        isOpen={isRecurringModalOpen} 
+      <RecurringModal
+        isOpen={isRecurringModalOpen}
         setIsOpen={setIsRecurringModalOpen}
         formTimeFrom={form.watch("timeFrom")}
         formTimeTo={form.watch("timeTo")}

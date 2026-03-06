@@ -80,7 +80,10 @@ export default function Page() {
     mutate(values);
   }
 
-  function openModal() {
+  function openModal(isEdit = false) {
+    if (!isEdit) {
+      resetFields(); // clear form for "Add New"
+    }
     setIsModalOpen(true);
   }
 
@@ -89,14 +92,14 @@ export default function Page() {
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Price Package</DialogTitle>
+            <DialogTitle>{form.watch("_id") ? "Edit Price Package" : "Add Price Package"}</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <FormSchemaProvider schema={schema}>
               <form className="space-y-[20px]" onSubmit={form.handleSubmit(onSubmit)}>
                 <FormInput<Schema> label="Package Name" name="packageName" placeholder="Example: CrossFit" />
                 <FormInput<Schema> isTextArea name="description" label="Description (Max:200 words)" />
-                <FormInput<Schema> type="number" label="Price" name="price" placeholder="Example: CrossFit" />
+                <FormInput<Schema> type="number" label="Price" name="price" placeholder="Example: 10000" />
                 <Button disabled={creatingPrice} size="sm">
                   Done
                 </Button>
@@ -107,14 +110,14 @@ export default function Page() {
       </Dialog>
 
       <section className="flex min-h-full flex-col w-full font-inter gap-10 ">
-        <SectionHeader onClick={openModal} rightElementText="Add New" title="Price Packages" />
+        <SectionHeader onClick={() => openModal(false)} rightElementText="Add New" title="Price Packages" />
 
         {isPending || !data ? (
           <LoadingComponent />
         ) : (
           <>
             {data?.data.length == 0 ? (
-              <Empty onClick={openModal} desc="You do not have any Price Packages yet. Prices would appear here. " alt="Price Icon" linkText="Add Price" src="/price-tag.png" />
+              <Empty onClick={() => openModal(false)} desc="You do not have any Price Packages yet. Prices would appear here. " alt="Price Icon" linkText="Add Price" src="/price-tag.png" />
             ) : (
               <section
                 style={{
@@ -134,7 +137,7 @@ export default function Page() {
                       <Button
                         onClick={() => {
                           form.reset({ ...plan });
-                          openModal();
+                          openModal(true);
                         }}
                         className="px-[100px] h-[45px]"
                         variant="outline"
