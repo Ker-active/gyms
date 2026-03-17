@@ -98,3 +98,18 @@ export const useGetDashboardMetricWeekly = (date: Date = new Date()) => {
     },
   });
 };
+
+
+export const useGetClassesByUser = (q: GetClassQueryKey) => {
+  return useQuery({
+    queryKey: [CacheKeys.CLASSES, q],
+    queryFn: async () => {
+      return client.get("/user/classes", { params: q }).then((res) => res.data as Promise<IClassResponse>);
+    },
+  });
+};
+
+interface GetClassQueryKey {
+  trainer?: string;
+  gym?: string;
+}

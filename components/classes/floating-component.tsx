@@ -58,7 +58,7 @@ export const FloatingComponent = ({ isForTrainer = false, onlineLink = "online l
               </MenubarItem>
             )}
 
-            {isForTrainer && (
+            {/* {isForTrainer && (
               <MenubarItem
                 onClick={(e) => {
                   stopPropagation(e);
@@ -72,7 +72,7 @@ export const FloatingComponent = ({ isForTrainer = false, onlineLink = "online l
                 </div>
                 <ChevronRight size={16} />
               </MenubarItem>
-            )}
+            )} */}
 
             <MenubarSub>
               <MenubarSubTrigger className="flex flex-row items-center text-sm text-[#344054] justify-between w-full">

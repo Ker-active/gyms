@@ -5,8 +5,9 @@ import Image from "next/image";
 interface IProps {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  classContent?: any;
 }
-export const BookNowModal = ({ isOpen, setIsOpen }: IProps) => {
+export const BookNowModal = ({ isOpen, setIsOpen, classContent }: IProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="w-[90vw] sm:min-w-[850px] overflow-y-auto max-h-[80dvh]  flex flex-col sm:flex-row gap-4 sm:gap-[30px]">

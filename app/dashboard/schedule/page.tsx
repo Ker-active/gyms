@@ -3,12 +3,12 @@ import { MyCalendar } from "@/components/calender/calender";
 import { Classes } from "@/components/classes";
 import { DateChange, LoadingComponent } from "@/components/shared";
 import { buttonVariants } from "@/components/ui/button";
-import { useGetClasss } from "@/hooks/shared";
+import { useGetClassesByUser } from "@/hooks/shared";
 import { Routes } from "@/lib";
 import Link from "next/link";
 
 export default function Class() {
-  const { data, isLoading } = useGetClasss();
+  const { data, isLoading } = useGetClassesByUser({});
 
   return (
     <section className=" flex flex-col gap-6">

@@ -4,13 +4,13 @@ import { ClassInfo } from "@/components/classes/class-info";
 import { DateChange, LoadingComponent } from "@/components/shared";
 import DateCalendarNavigation from "@/components/shared/date-calendar-navigation";
 import { Button } from "@/components/ui/button";
-import { useGetClasss } from "@/hooks/shared";
+import { useGetClassesByUser } from "@/hooks/shared";
 import { getClassesForDate, getClassesForDateArray, Routes } from "@/lib";
 import Link from "next/link";
 import { useMemo } from "react";
 
 export default function Root() {
-  const { data, isPending } = useGetClasss();
+  const { data, isPending } = useGetClassesByUser({});
   const classesInfo = useMemo(() => {
     return {
       today: getClassesForDateArray(data?.data ?? [], new Date()),

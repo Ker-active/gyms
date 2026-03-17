@@ -16,6 +16,33 @@ import { toast } from "sonner";
 import { Routes } from "@/lib";
 import { useRouter } from "nextjs-toploader/app";
 import { z } from "zod";
+import { OperatingTimes } from "@/components/profile/operating-times";
+
+const timeSchema = z
+  .object({
+    from: z.string().optional(),
+    to: z.string().optional(),
+  })
+  .refine((data) => !(data.from && !data.to), {
+    message: "End time is required",
+    path: ["to"],
+  })
+  .refine((data) => !(!data.from && data.to), {
+    message: "Start time is required",
+    path: ["from"],
+  })
+  .refine(
+    (data) => {
+      if (data.from && data.to) {
+        return data.from <= data.to;
+      }
+      return true;
+    },
+    {
+      message: "End time cannot be earlier than start time",
+      path: ["to"],
+    },
+  );
 
 const schema = z.object({
   personalInformation: z.object({
@@ -32,6 +59,17 @@ const schema = z.object({
   services: z.array(z.string().min(1, { message: "Service is required." })),
   amenities: z.array(z.string().min(1, { message: "This is required." })),
   media: z.array(z.any()),
+  operatingTimes: z
+    .object({
+      sunday: timeSchema,
+      monday: timeSchema,
+      tuesday: timeSchema,
+      wednesday: timeSchema,
+      thursday: timeSchema,
+      friday: timeSchema,
+      saturday: timeSchema,
+    })
+    .optional(),
 });
 
 export type TProfile = z.infer<typeof schema>;
@@ -91,6 +129,10 @@ export default function Page() {
         formData.append("media", media);
       });
 
+      if (data.operatingTimes) {
+        formData.append("operatingTimes", JSON.stringify(data.operatingTimes));
+      }
+
       return client.put(`/user/update/${userData?.data._id}`, formData);
     },
     onError: (error) => {
@@ -113,6 +155,7 @@ export default function Page() {
         amenities: userData?.data.amenities || [],
         services: userData?.data.services || [],
         media: userData?.data.media || [],
+        operatingTimes: userData?.data?.operatingTimes || {},
       });
     }
   }, [userData]);
@@ -160,6 +203,7 @@ export default function Page() {
             <ProfessionalSummary />
             <Services />
             <Amenities />
+            <OperatingTimes />
             <Media />
           </form>
         </FormSchemaProvider>

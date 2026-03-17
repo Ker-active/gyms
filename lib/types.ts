@@ -19,6 +19,22 @@ export interface TUser {
   profilePhoto: string;
   location: string;
   professionalSummary: string;
+  operatingTimes?: TOperatingTimes;
+}
+
+export interface TOperatingTime {
+  from?: string;
+  to?: string;
+}
+
+export interface TOperatingTimes {
+  monday?: TOperatingTime;
+  tuesday?: TOperatingTime;
+  wednesday?: TOperatingTime;
+  thursday?: TOperatingTime;
+  friday?: TOperatingTime;
+  saturday?: TOperatingTime;
+  sunday?: TOperatingTime;
 }
 
 interface SocialMedia {

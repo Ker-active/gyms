@@ -73,7 +73,7 @@ export default function Page({ params }: { params: { slug: string } }) {
               {data?.data.title} by {data.data.trainer?.fullname}
             </p>
             <div className="flex gap-4 flex-row items-center">
-              <AddMember />
+              {/* <AddMember /> */}
               <Popover>
                 <PopoverTrigger asChild>
                   <Button style={{ boxShadow: "0px 4px 4px 0px #BED8FF40" }} variant="ghost" size="icon" className="bg-[#F4F3F6] min-w-[45px]  rounded-[10px] place-self-end">
@@ -117,7 +117,7 @@ export default function Page({ params }: { params: { slug: string } }) {
         </article>
 
         <article className="space-y-2 py-[35px] text-[#1C1939] px-[34px]">
-          <h3 className="font-semibold">Booked</h3>
+          {/* <h3 className="font-semibold">Booked</h3> */}
           <div className="flex gap-[20px] overflow-x-auto flex-col">
             <Table className="border-separate border-spacing-y-5">
               <TableBody>

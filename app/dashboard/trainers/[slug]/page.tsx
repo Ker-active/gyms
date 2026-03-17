@@ -6,7 +6,7 @@ import { Classes } from "@/components/classes";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "nextjs-toploader/app";
-import { useGetClassDetails, useGetClasss, useGetTrainer } from "@/hooks/shared";
+import { useGetTrainer, useGetClassesByUser } from "@/hooks/shared";
 
 const TrainersMedia = [
   {
@@ -34,6 +34,8 @@ const TrainersMedia = [
 export default function TrainersDetails({ params }: { params: { slug: string } }) {
   const router = useRouter();
   const { data, isPending } = useGetTrainer(params.slug);
+  const { data: classData, isPending: classDataPending } = useGetClassesByUser({trainer: params.slug});
+
   // const { data: clas} = useGetClassDetails()
   return (
     <section className="flex min-h-full flex-col w-full font-inter gap-10">
@@ -49,7 +51,7 @@ export default function TrainersDetails({ params }: { params: { slug: string } }
           Deactivate
         </Button>
       </header>
-      {isPending ? (
+      {isPending || classDataPending ? (
         <LoadingComponent />
       ) : (
         <section className="flex  flex-col gap-[40px]">
@@ -62,9 +64,9 @@ export default function TrainersDetails({ params }: { params: { slug: string } }
               <header>
                 <h2 className="text-[#1C1939] font-bold text-lg lg:text-2xl">{data?.data.fullname}</h2>
                 <p className="text-[#737373]">{data?.data.services.join(", ")}</p>
-                <a className="text-[#3385FF]" href="#">
+                {/* <a className="text-[#3385FF]" href="#">
                   @ker-Fitness
-                </a>
+                </a> */}
               </header>
               <p className="text-[#6B6868]">{data?.data.professionalSummary}</p>
               <ListInfo title="Special Services" item={["Pre-natal", "Post-natal", "BasketBall"]} />
@@ -83,9 +85,9 @@ export default function TrainersDetails({ params }: { params: { slug: string } }
           {(data?.data.media?.length || 0) > 0 && (
             <section className="flex flex-col gap-6">
               <h2 className="section-header">Media</h2>
-              <section className="bg-white gap-4 grid-container p-4">
+              <section className="bg-white gap-4 grid-container pt-4 pr-4 pb-0 pl-4 h-fit">
                 {data?.data.media.map((media, index) => (
-                  <div key={index} className="relative border w-full">
+                  <div key={index} className="relative border w-full h-40">
                     <Image fill src={media} alt="Trainer's media" />
                   </div>
                 ))}
@@ -100,12 +102,12 @@ export default function TrainersDetails({ params }: { params: { slug: string } }
 
           <section className="flex flex-col gap-6">
             <h2 className="section-header">Classes</h2>
-            <Classes isForTrainer />
+            <Classes isForTrainer classDetails={classData?.data} />
           </section>
-          <section className="flex flex-col gap-6">
+          {/* <section className="flex flex-col gap-6">
             <h2 className="section-header">Reviews</h2>
             <ReviewComponent hideAddButton />
-          </section>
+          </section> */}
         </section>
       )}
     </section>
